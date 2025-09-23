@@ -9,7 +9,7 @@ export const catImages = [
   },
   {
     id: 2,
-    image: "/categories/savon.webp",
+    image: "/categories/savonnette.webp",
     title: "Savon",
     slug: "savon",
   },
