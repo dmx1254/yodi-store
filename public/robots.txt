@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yodistore.vercel.app/sitemap.xml
+
+# Pages à ne pas indexer (authentification et profil)
+Disallow: /connexion
+Disallow: /inscription
+Disallow: /mot-de-passe-oublie
+Disallow: /profile/
+Disallow: /api/
+
+# Pages importantes à indexer
+Allow: /
+Allow: /tisane-detox
+Allow: /savon
+Allow: /tisane-digestive
+Allow: /baume-barbe
+Allow: /cheveux
+Allow: /huile-a-barbe
+Allow: /panier
+Allow: /checkout
+Allow: /condition-dutilisations
+
+# Crawl-delay pour éviter la surcharge
+Crawl-delay: 1

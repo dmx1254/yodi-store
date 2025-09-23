@@ -35,10 +35,40 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "YODI Cosmetics",
-  description: "Vous trouverez ici toute les sortes de produit cosmétiques",
+  title: "yodi-store Cosmetics",
+  description:
+    "Yodi-store vend des produits pharmaceutiques et cosmétiques, vous trouverez ici toute les sortes de produit cosmétiques",
   icons: {
     icon: "/logo.png",
+  },
+
+  keywords: [
+    "yodi-store",
+    "yodi-store Cosmetics",
+    "yodi-store pharmaceutiques",
+    "yodi-store cosmétiques",
+    "dakar",
+    "sénégal",
+    "Tisane Detox",
+    "Savon",
+    "Tisane Digestive",
+    "Baume à Barbe",
+    "Cheveux",
+    "Huile à Barbe",
+  ],
+
+  openGraph: {
+    title: "yodi-store Cosmetics",
+    description:
+      "Yodi-store vend des produits parapharmaceutiques et cosmétiques, vous trouverez ici toute les sortes de produit cosmétiques",
+    images: "/logo.png",
+  },
+
+  twitter: {
+    title: "yodi-store Cosmetics",
+    description:
+      "Yodi-store vend des produits parapharmaceutiques et cosmétiques, vous trouverez ici toute les sortes de produit cosmétiques",
+    images: "/logo.png",
   },
 };
 
