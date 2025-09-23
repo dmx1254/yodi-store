@@ -6,7 +6,7 @@ import VerificationModel from "@/lib/models/verification";
 import RegisterTemplate from "@/components/registerTemplate";
 import { connectDB } from "@/lib/db";
 
-const resend = new Resend(process.env.RESEND_2IBN_API_KEY) || "re_9W11UDRG_AHiyyuWSdbuNyhEUCbgBbQgk";
+const resend = new Resend(process.env.RESEND_API_KEY || "re_9W11UDRG_AHiyyuWSdbuNyhEUCbgBbQgk");
 
 await connectDB();
 
