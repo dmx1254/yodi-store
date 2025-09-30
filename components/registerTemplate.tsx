@@ -40,7 +40,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
             margin: '0 0 10px 0',
             fontWeight: 'bold'
           }
-        }, 'Bienvenue chez Cosme !'),
+        }, 'Bienvenue chez Yodi Cosmetics !'),
         React.createElement('p', {
           key: 'subtitle',
           style: { 
@@ -179,9 +179,9 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
           style: { 
             color: '#999', 
             fontSize: '12px', 
-            margin: '0 0 10px 0' 
+            margin: '0 0 10px 0'
           }
-        }, 'Si vous n\'avez pas créé de compte sur Cosme, ignorez cet email.'),
+        }, 'Si vous n\'avez pas créé de compte sur Yodi Cosmetics, ignorez cet email.'),
         React.createElement('p', {
           key: 'footer-text2',
           style: { 
@@ -189,7 +189,7 @@ const RegisterTemplate: React.FC<RegisterTemplateProps> = ({
             fontSize: '12px', 
             margin: '0' 
           }
-        }, '© 2024 Cosme. Tous droits réservés.')
+        }, '© 2024 Yodi Cosmetics. Tous droits réservés.')
       ])
     ])
   ]);

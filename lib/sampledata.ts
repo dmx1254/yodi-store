@@ -5,7 +5,7 @@ export const catImages = [
     id: 1,
     image: "/categories/tisane-detox.webp",
     title: "Tisane Detox",
-    slug: "tisane-detox",
+    slug: "tisane/detox",
   },
   {
     id: 2,
@@ -17,25 +17,25 @@ export const catImages = [
     id: 3,
     image: "/categories/tisane-digestive.webp",
     title: "Tisane Digestive",
-    slug: "tisane-digestive",
+    slug: "tisane/digestive",
   },
   {
     id: 4,
     image: "/categories/baume-a-barbe.webp",
     title: "Baume à Barbe",
-    slug: "baume-barbe",
+    slug: "baume/baume-barbe",
   },
   {
     id: 5,
     image: "/categories/cheveux.webp",
     title: "Cheveux",
-    slug: "cheveux",
+    slug: "huile/cheveux",
   },
   {
     id: 6,
     image: "/categories/huile-a-barbe.webp",
     title: "Huile à Barbe",
-    slug: "huile-a-barbe",
+    slug: "huile/huile-barbe",
   },
 ];
 
@@ -83,7 +83,7 @@ export const categories: Category[] = [
     subcategories: [
       {
         title: "Baume à barbe",
-        slug: "huile-a-barbe",
+        slug: "baume-a-barbe",
         id: "zvalpqvxj",
       },
       {
