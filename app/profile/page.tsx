@@ -29,6 +29,7 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { signOut } from "next-auth/react";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserR | null>(null);
@@ -50,6 +51,7 @@ export default function ProfilePage() {
   const [editSuccess, setEditSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [passwords, setPasswords] = useState({ old: "", new: "", confirm: "" });
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -96,6 +98,29 @@ export default function ProfilePage() {
   // Initiales pour l'avatar
   const initials =
     `${user.firstname?.[0] || ""}${user.lastname?.[0] || ""}`.toUpperCase();
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleteLoading(true);
+      const res = await fetch("/api/user/delete-account", {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Compte supprimé avec succès", {
+        duration: 3000,
+        style: {
+          color: "#10b981",
+        },
+        position: "top-right",
+      });
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-start justify-center gap-8 p-4">
@@ -487,6 +512,13 @@ export default function ProfilePage() {
               </DialogClose>
             </DialogFooter>
           </form>
+          <button
+            className="mt-6 px-6 py-2 rounded bg-red-600 text-white font-semibold cursor-pointer hover:opacity-75"
+            onClick={handleDeleteAccount}
+            disabled={deleteLoading}
+          >
+            {deleteLoading ? "Suppression..." : "Supprimer mon compte"}
+          </button>
         </DialogContent>
       </Dialog>
     </div>

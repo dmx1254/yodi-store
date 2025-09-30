@@ -240,6 +240,37 @@ const CheckoutPage = () => {
                     <option value="">Sélectionnez votre pays</option>
                     <option value="Sénégal">Sénégal</option>
                     <option value="Canada">Canada</option>
+                    <option value="France">France</option>
+                    <option value="Belgique">Belgique</option>
+                    <option value="Mali">Mali</option>
+                    <option value="Côte d'Ivoire">Côte d&apos;Ivoire</option>
+                    <option value="Guinée">Guinée</option>
+                    <option value="Sierra Leone">Sierra Leone</option>
+                    <option value="Liberia">Liberia</option>
+                    <option value="Gambie">Gambie</option>
+                    <option value="Guinée-Bissau">Guinée-Bissau</option>
+                    <option value="Mauritanie">Mauritanie</option>
+                    <option value="Luxembourg">Luxembourg</option>
+                    <option value="Suisse">Suisse</option>
+                    <option value="Allemagne">Allemagne</option>
+                    <option value="Italie">Italie</option>
+                    <option value="Espagne">Espagne</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="Grèce">Grèce</option>
+                    <option value="Turquie">Turquie</option>
+                    <option value="Maroc">Maroc</option>
+                    <option value="Algérie">Algérie</option>
+                    <option value="Tunisie">Tunisie</option>
+                    <option value="Egypte">Egypte</option>
+                    <option value="Jordanie">Jordanie</option>
+                    <option value="Arabie Saoudite">Arabie Saoudite</option>
+                    <option value="Oman">Oman</option>
+                    <option value="Qatar">Qatar</option>
+                    <option value="Bahreïn">Bahreïn</option>
+                    <option value="Koweït">Koweït</option>
+                    <option value="Emirats Arabes Unis">
+                      Emirats Arabes Unis
+                    </option>
                   </select>
                 </div>
               </div>

@@ -41,23 +41,61 @@ export const catImages = [
 
 export const categories: Category[] = [
   {
-    title: "Tisane detox",
-    slug: "tisane-detox",
+    title: "Tisane",
+    slug: "tisane",
     id: "hnjs12k",
+    subcategories: [
+      {
+        title: "Detox",
+        slug: "detox",
+        id: "nxhapie",
+      },
+      {
+        title: "Digestive",
+        slug: "digestive",
+        id: "vqpaxj",
+      },
+    ],
   },
   {
-    title: "Tisane digestive",
-    slug: "tisane-digestive",
-    id: "kjb29lr",
-  },
-  {
-    title: "Huile a barbe",
-    slug: "huile-a-barbe",
+    title: "Huile",
+    slug: "huile",
     id: "pacf9l4",
+
+    subcategories: [
+      {
+        title: "Huile barbe",
+        slug: "huile-barbe",
+        id: "bzparer",
+      },
+      {
+        title: "Huile cheveux",
+        slug: "huile-cheveux",
+        id: "zpqadi",
+      },
+    ],
   },
   {
-    title: "Baume à barbe",
-    slug: "baume-barbe",
+    title: "Baume",
+    slug: "baume",
+    id: "nzpwtb",
+
+    subcategories: [
+      {
+        title: "Baume à barbe",
+        slug: "huile-a-barbe",
+        id: "zvalpqvxj",
+      },
+      {
+        title: "Baume pour cheveux",
+        slug: "baume-pour-cheveux",
+        id: "xpaceioa",
+      },
+    ],
+  },
+  {
+    title: "Gomme à lèvres",
+    slug: "gomme-a-levres",
     id: "gyg6k6h",
   },
   {
@@ -70,14 +108,36 @@ export const categories: Category[] = [
         slug: "op",
         id: "yfb74l7",
       },
-      {
-        title: "Huile",
-        slug: "huile",
-        id: "hiuan5y",
-      },
+     
     ],
   },
 ];
+
+export const productMock = {
+  id: "hgushyk",
+  title: "Topicrem Mela Lait Unifiant Ultra-Hydratant Spf15 500ml",
+  price: 2700,
+  discount: 20,
+  imageUrl: "/products/timex.jpg",
+  category: "Soins du visage",
+  benefits: [
+    "Unifie le teint",
+    "Corrige et prévient l'apparition des taches",
+    "Protection SPF15 (UVA/UVB)",
+    "Hydratation intense 24h",
+    "Peaux sensibles - Taches",
+    "Hydrate 24H",
+  ],
+  stock: 10,
+  brand: "TOPICREM",
+  sku: "14526",
+  etiquette: "TOPICREM MELA",
+  description:
+    "Le Topicrem Mela Lait Unifiant Ultra-Hydratant est un soin innovant qui unifie le teint tout en corrigeant et prévenant l'apparition des taches. Sa formule enrichie en actifs éclaircissants et hydratants offre une protection SPF15 contre les rayons UVA/UVB.",
+  usage:
+    "Appliquez le produit sur le visage et le cou le matin et le soir après nettoyage. Utilisez en complément de votre routine de soins habituelle.",
+  quantity: 1,
+};
 
 export const products = [
   {

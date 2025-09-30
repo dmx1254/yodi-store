@@ -2,10 +2,12 @@
 
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useState, useRef } from "react";
-import { CART } from "@/lib/types/types";
+import { useState, useRef, useEffect } from "react";
 import useStore from "@/lib/store-manage";
 import { toast } from "sonner";
+import { IProduct } from "@/lib/models/product";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 const ProductDetailPage = () => {
   const { addToCart } = useStore();
@@ -16,72 +18,200 @@ const ProductDetailPage = () => {
   const [showMagnifier, setShowMagnifier] = useState(false);
   const [magnifierPos, setMagnifierPos] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
+  const [product, setProduct] = useState<IProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const product = await fetch(`/api/products/${productname}`);
+        const data = await product.json();
+        setProduct(data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [productname]);
 
   // Simuler un produit (remplacez par la vraie logique de récupération)
-  const product = {
-    id: "hgushyk",
-    title: "Topicrem Mela Lait Unifiant Ultra-Hydratant Spf15 500ml",
-    price: 2700,
-    discount: 20,
-    imageUrl: "/products/timex.jpg",
-    category: "Soins du visage",
-    benefits: [
-      "Unifie le teint",
-      "Corrige et prévient l'apparition des taches",
-      "Protection SPF15 (UVA/UVB)",
-      "Hydratation intense 24h",
-      "Peaux sensibles - Taches",
-      "Hydrate 24H",
-    ],
-    stock: 10,
-    brand: "TOPICREM",
-    sku: "14526",
-    etiquette: "TOPICREM MELA",
-    description:
-      "Le Topicrem Mela Lait Unifiant Ultra-Hydratant est un soin innovant qui unifie le teint tout en corrigeant et prévenant l'apparition des taches. Sa formule enrichie en actifs éclaircissants et hydratants offre une protection SPF15 contre les rayons UVA/UVB.",
-    usage:
-      "Appliquez le produit sur le visage et le cou le matin et le soir après nettoyage. Utilisez en complément de votre routine de soins habituelle.",
-    quantity: 1,
-  };
 
   const increaseQuantity = () => setQuantity((prev) => prev + 1);
   const decreaseQuantity = () =>
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  const handleAddToCart = (product: CART) => {
-    const newProduct = { ...product, quantity: quantity };
+  const handleAddToCart = (product: IProduct) => {
+    const newProduct = {
+      ...product,
+      quantity: quantity,
+      id: product._id as string,
+    };
     addToCart(newProduct);
     toast.success("Produit ajouté au panier");
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageRef.current) return;
-    
+
     const rect = imageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     setMagnifierPos({ x, y });
   };
+
+  const handleMouseEnter = () => {
+    setShowMagnifier(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowMagnifier(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-8 px-4 font-josefin">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Breadcrumb skeleton */}
+          <div className="text-xs text-gray-600 mb-6 flex items-end justify-end">
+            <Skeleton className="w-48 h-4" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Colonne gauche - Image skeleton */}
+            <div className="lg:col-span-2 relative">
+              <div className="relative">
+                <Skeleton className="w-full h-[600px]" />
+
+                {/* Icône de recherche skeleton */}
+                <div className="absolute top-4 left-4">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                </div>
+              </div>
+            </div>
+
+            {/* Colonne droite - Détails skeleton */}
+            <div className="lg:col-span-3 space-y-4">
+              {/* Titre skeleton */}
+              <Skeleton className="w-full h-8" />
+              <Skeleton className="w-3/4 h-6" />
+
+              {/* Prix skeleton */}
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-20 h-6" />
+                <Skeleton className="w-24 h-8" />
+              </div>
+
+              {/* Avantages skeleton */}
+              <div className="space-y-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Skeleton className="w-2 h-2 rounded-full" />
+                    <Skeleton className="w-full h-4" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Stock skeleton */}
+              <Skeleton className="w-16 h-4" />
+
+              {/* Sélecteur de quantité et bouton skeleton */}
+              <div className="flex md:flex-row flex-col items-start md:items-center gap-4">
+                <Skeleton className="w-16 h-4" />
+                <div className="flex items-center rounded-md">
+                  <Skeleton className="w-8 h-8" />
+                  <Skeleton className="w-16 h-8 mx-4" />
+                  <Skeleton className="w-8 h-8" />
+                </div>
+                <Skeleton className="w-32 h-12 rounded-md" />
+              </div>
+
+              {/* Informations marque skeleton */}
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-12 h-4" />
+                <Skeleton className="w-24 h-4" />
+              </div>
+
+              {/* Information livraison skeleton */}
+              <div className="border inline-flex flex-col items-start gap-2 p-2 my-2">
+                <Skeleton className="w-64 h-4" />
+                <Skeleton className="w-48 h-3" />
+              </div>
+
+              {/* SKU skeleton */}
+              <div className="flex items-center gap-2">
+                <Skeleton className="w-20 h-3" />
+                <Skeleton className="w-24 h-3" />
+              </div>
+
+              {/* Onglets skeleton */}
+              <div className="mt-12 mb-8">
+                <div className="flex md:flex-row flex-col items-start md:items-center gap-4">
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <Skeleton key={index} className="w-32 h-8" />
+                  ))}
+                </div>
+              </div>
+
+              {/* Contenu des onglets skeleton */}
+              <div className="min-h-[200px]">
+                <div className="space-y-3">
+                  <Skeleton className="w-24 h-4" />
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-3/4 h-4" />
+                  <Skeleton className="w-full h-4" />
+                  <Skeleton className="w-5/6 h-4" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white py-8 px-4 font-josefin flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Produit non trouvé
+          </h1>
+          <p className="text-gray-600">
+            Le produit que vous recherchez n&apos;existe pas.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="min-h-screen bg-white py-8 px-4 font-josefin">
         <div className="max-w-7xl mx-auto px-4">
           {/* Breadcrumb */}
-          <div className="text-xs text-gray-600 mb-6 flex items-end justify-end">
-            Accueil / Soins du visage / {product.title}
+          <div className="gap-2 text-xs text-gray-600 mb-6 flex items-end justify-end">
+            <Link href="/">Accueil</Link> /{" "}
+            <Link href={`/${product.category}`}>{product.category}</Link> /{" "}
+            <Link href={`/${product.category}/${product.subCategory}`}>
+              {product.subCategory}
+            </Link>{" "}
+            / {product.title}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Colonne gauche - Image du produit (40%) */}
             <div className="lg:col-span-2 relative">
-              {/* Image principale avec effet de loupe */}
-              <div 
+              {/* Image principale avec effet de loupe amélioré */}
+              <div
                 ref={imageRef}
-                className="relative cursor-zoom-in"
-                onMouseEnter={() => setShowMagnifier(true)}
-                onMouseLeave={() => setShowMagnifier(false)}
+                className="relative cursor-zoom-in bg-gray-50 rounded-lg overflow-hidden"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 onMouseMove={handleMouseMove}
               >
                 <Image
@@ -89,38 +219,39 @@ const ProductDetailPage = () => {
                   alt={product.title}
                   width={500}
                   height={600}
-                  className="w-full h-auto object-contain"
+                  className="w-full h-auto object-contain transition-opacity duration-300"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src =
-                      "https://via.placeholder.com/500x600/f0f0f0/666?text=Topicrem+Mela";
+                      "https://via.placeholder.com/500x600/f0f0f0/666?text=Image+Not+Found";
                   }}
                 />
 
-                {/* Effet de loupe */}
-                {showMagnifier && (
-                  <div 
+                {/* Effet de loupe simple */}
+                {showMagnifier && imageRef.current && (
+                  <div
                     className="absolute pointer-events-none w-32 h-32 border-2 border-white rounded-full overflow-hidden shadow-lg z-20"
                     style={{
-                      left: magnifierPos.x,
-                      top: magnifierPos.y,
+                      left: magnifierPos.x - 64,
+                      top: magnifierPos.y - 64,
                     }}
                   >
                     <Image
                       src={product.imageUrl}
                       alt={product.title}
-                      width={200}
-                      height={200}
+                      width={500}
+                      height={600}
                       className="w-full h-full object-cover"
                       style={{
-                        transform: `scale(2) translate(${-magnifierPos.x - 64}px, ${-magnifierPos.y - 64}px)`,
+                        transform: `scale(2.5) translate(${-magnifierPos.x + 64}px, ${-magnifierPos.y + 64}px)`,
+                        transformOrigin: "top left",
                       }}
                     />
                   </div>
                 )}
 
                 {/* Icône de recherche */}
-                <button 
+                <button
                   onClick={() => setShowModal(true)}
                   className="absolute top-4 left-4 bg-white/80 hover:bg-white p-2 rounded-full transition-colors z-10"
                 >
@@ -155,7 +286,10 @@ const ProductDetailPage = () => {
                 </span>
                 {product.discount && (
                   <span className="text-[#A36F5E] text-2xl font-bold">
-                    {Math.round(product.price - (product.price * product.discount / 100))} FCFA
+                    {Math.round(
+                      product.price - (product.price * product.discount) / 100
+                    )}{" "}
+                    FCFA
                   </span>
                 )}
               </div>
@@ -263,7 +397,9 @@ const ProductDetailPage = () => {
               <div className="min-h-[200px]">
                 {activeTab === "description" && (
                   <div>
-                    <h3 className="font-semibold text-sm mb-3">Description :</h3>
+                    <h3 className="font-semibold text-sm mb-3">
+                      Description :
+                    </h3>
                     <p className="text-gray-700 leading-relaxed text-sm">
                       {product.description}
                     </p>
@@ -322,7 +458,7 @@ const ProductDetailPage = () => {
             >
               ✕
             </button>
-            
+
             {/* Image en plein écran */}
             <Image
               src={product.imageUrl}

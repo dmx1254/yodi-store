@@ -157,7 +157,7 @@ const Hero = () => {
             <Link href={`/${category.slug}`}>{category.title}</Link>
 
             {isOpen && selectedId === category.id && category.subcategories && (
-              <div className="bg-white z-50 flex flex-col gap-2 absolute top-14 left-0 p-4">
+              <div className="bg-white min-w-[200px] z-50 flex flex-col gap-2 absolute top-14 left-0 p-4">
                 {category.subcategories?.map((subcategory, index) => (
                   <Link
                     href={`/${category.slug}/${subcategory.slug}`}

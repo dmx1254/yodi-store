@@ -21,18 +21,18 @@ const Footer = () => {
         boxShadow: "rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset",
       }}
     >
-      <div className="flex flex-col items-center gap-2">
+      <Link href="/" className="flex flex-col items-center gap-2">
         <Home className="w-5 h-5 text-black" />
         <span className="text-black">Accueil</span>
-      </div>
+      </Link>
       <div className="flex flex-col items-center gap-2">
         <BoxIcon className="w-5 h-5 text-black" />
         <span className="text-black">Marque</span>
       </div>
-      <div className="flex flex-col items-center gap-2">
+      <Link href="/panier" className="flex flex-col items-center gap-2">
         <ShoppingCart className="w-5 h-5 text-black" />
         <span className="text-black">Panier</span>
-      </div>
+      </Link>
       <Link
         href={session?.user ? "/profile" : "/connexion"}
         className="flex flex-col items-center gap-2"
