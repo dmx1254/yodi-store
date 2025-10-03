@@ -104,11 +104,36 @@ export const categories: Category[] = [
     id: "mb13w3q",
     subcategories: [
       {
+        title: "Savon au curcuma et miel",
+        slug: "savon-au-curcuma-et-miel",
+        id: "hzbshqwo",
+      },
+
+      {
+        title: "Savon au agrumes",
+        slug: "savon-au-agrumes",
+        id: "aocwgjs",
+      },
+      {
+        title: "Savon a l'avoine et au beurre de karité",
+        slug: "savon-a-lavoine-et-au-beurre-de-karite",
+        id: "slpsakce",
+      },
+      {
+        title: "savon exfoliant au citron et au graines de pavot",
+        slug: "savon-exfoliant-au-citron-et-au-graines-de-pavot",
+        id: "asckppao",
+      },
+      {
+        title: "Savon purifiant au laurier et clous de girofle",
+        slug: "savon-purifiant-au-laurier-et-clous-de-girofle",
+        id: "aoscqwcwjnc",
+      },
+      {
         title: "Op",
         slug: "op",
         id: "yfb74l7",
       },
-     
     ],
   },
 ];
@@ -296,7 +321,6 @@ export const products = [
   },
 ];
 
-
 export const currentSelection = [
   {
     id: "hsy51",
@@ -317,7 +341,8 @@ export const currentSelection = [
   {
     id: "xqy73",
     title: "Jus de tisane detox",
-    description: "Jus de tisane detox prepare avec soin pour enlever des toxines",
+    description:
+      "Jus de tisane detox prepare avec soin pour enlever des toxines",
     category: "tisane-detox",
     productImage: "/current/tisane.webp",
     isActive: false,

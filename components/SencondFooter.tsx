@@ -93,7 +93,7 @@ const SencondFooter = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-gray-600 font-josefin">
-                  contact@yodi-store.com
+                  yodistores@gmail.com
                 </p>
                 <a
                   href="tel:+221789689698"

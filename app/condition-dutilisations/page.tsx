@@ -159,10 +159,10 @@ const ConditionDutilisations = () => {
           <p className="text-sm text-gray-500 font-josefin mt-2">
             Pour toute question concernant ces conditions, contactez-nous à
             <a
-              href="mailto:contact@yodi-store.com"
+              href="mailto:yodistores@gmail.com"
               className="text-[#A36F5E] hover:underline ml-1"
             >
-              contact@yodi-store.com
+              yodistores@gmail.com
             </a>
           </p>
         </div>
