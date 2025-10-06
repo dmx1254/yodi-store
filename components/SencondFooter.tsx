@@ -120,7 +120,7 @@ const SencondFooter = () => {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    href="/categories/tisane-detox"
+                    href="/tisane/detox"
                     className="text-sm text-gray-600 hover:text-[#A36F5E] font-josefin"
                   >
                     Tisane Detox
@@ -128,7 +128,7 @@ const SencondFooter = () => {
                 </li>
                 <li>
                   <Link
-                    href="/categories/tisane-digestive"
+                    href="/tisane/digestive"
                     className="text-sm text-gray-600 hover:text-[#A36F5E] font-josefin"
                   >
                     Tisane Digestive
@@ -136,7 +136,7 @@ const SencondFooter = () => {
                 </li>
                 <li>
                   <Link
-                    href="/categories/huile-a-barbe"
+                    href="/huile/huile-barbe"
                     className="text-sm text-gray-600 hover:text-[#A36F5E] font-josefin"
                   >
                     Huile à Barbe
@@ -144,7 +144,7 @@ const SencondFooter = () => {
                 </li>
                 <li>
                   <Link
-                    href="/categories/savon"
+                    href="/savon"
                     className="text-sm text-gray-600 hover:text-[#A36F5E] font-josefin"
                   >
                     Savon
@@ -170,7 +170,7 @@ const SencondFooter = () => {
 
                 <li>
                   <Link
-                    href="/conditions"
+                    href="/condition-dutilisations"
                     className="text-sm text-gray-600 font-semibold hover:text-[#A36F5E] font-josefin"
                   >
                     Conditions d&apos;utilisation
