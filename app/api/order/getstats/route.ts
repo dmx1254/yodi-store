@@ -18,7 +18,7 @@ export async function GET() {
 
     // Récupérer toutes les commandes de l'utilisateur
     const orders = await OrderModel.find({ userId });
-    // console.log(orders);
+    console.log(orders);
 
     // Calculer les statistiques
     const totalOrders = orders.length;
