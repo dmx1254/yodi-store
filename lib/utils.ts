@@ -18,6 +18,8 @@ export interface OrderR {
   _id: string;
   userId: string;
   products: CART[];
+  selectedCurrency: string;
+  valueCurrency: number;
   shippingCost: number;
   total: number;
   paymentMethod: string;

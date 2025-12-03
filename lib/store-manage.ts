@@ -15,6 +15,11 @@ interface MyStore {
   getCartTotalDiscount: () => number;
   totalQuantity: number;
   updateCart: (product: CART) => void;
+  // Currency management
+  selectedCurrency: "XOF" | "USD";
+  usdRate: number;
+  setSelectedCurrency: (currency: "XOF" | "USD") => void;
+  setUsdRate: (rate: number) => void;
 }
 
 const useStore = create<MyStore>()(
@@ -22,6 +27,11 @@ const useStore = create<MyStore>()(
     (set, get) => ({
       carts: [],
       totalQuantity: 0,
+      selectedCurrency: "XOF" as "XOF" | "USD",
+      usdRate: 1,
+      setSelectedCurrency: (currency: "XOF" | "USD") =>
+        set({ selectedCurrency: currency }),
+      setUsdRate: (rate: number) => set({ usdRate: rate }),
       updateCart: (product: CART) => {
         const currentCarts = get().carts;
         const existingProduct = currentCarts.find(

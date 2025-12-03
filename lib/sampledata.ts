@@ -348,3 +348,42 @@ export const currentSelection = [
     isActive: false,
   },
 ];
+
+export const deleliveryZones = {
+  senegal: [
+    "Mermoz",
+    "VDN",
+    "Liberté 6",
+    "Sacré Cœur",
+    "Baobab",
+    "Point E",
+    "Yoff",
+    "Pikine",
+    "Medina",
+    "Rufisque",
+    "Grand Yoff",
+    "Colobane",
+    "Grand Dakar",
+    "HLM",
+    "Ouakam",
+    "Almadies",
+    "Parcelles Assainies",
+    "Ouest foire",
+    "Nord foire",
+    "Mbao",
+    "Keur Massar",
+    "Patte d'oie",
+    "Ngor",
+  ],
+  canada:[
+    "Montreal",
+    "Toronto",
+    "Vancouver",
+    "Calgary",
+    "Edmonton",
+    "Winnipeg",
+    "Hamilton",
+    "Ottawa",
+    "Quebec City",
+  ]
+};

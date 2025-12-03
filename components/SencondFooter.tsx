@@ -109,6 +109,13 @@ const SencondFooter = () => {
                 >
                  C/N +1 81 9 2 908365
                 </a>
+                <br />
+                <a
+                  href="tel:+18192908365"
+                  className="text-sm text-gray-600 font-josefin"
+                >
+                 Num. commercial : +221 78 012 84 86
+                </a>
               </div>
             </div>
 

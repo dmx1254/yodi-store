@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 const ProductDetailPage = () => {
-  const { addToCart } = useStore();
+  const { addToCart, selectedCurrency, usdRate } = useStore();
   const { productname } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
@@ -50,7 +50,13 @@ const ProductDetailPage = () => {
       id: product._id as string,
     };
     addToCart(newProduct);
-    toast.success("Produit ajouté au panier");
+    toast.success("Produit ajouté au panier", {
+      style: {
+        color: "#10b981",
+      },
+      position: "top-right",
+      duration: 3000,
+    });
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -282,14 +288,15 @@ const ProductDetailPage = () => {
               {/* Prix */}
               <div className="flex items-center gap-4">
                 <span className="text-[#A36F5E] line-through text-lg font-medium">
-                  {product.price}
+                  {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                 </span>
                 {product.discount && (
                   <span className="text-[#A36F5E] text-2xl font-bold">
                     {Math.round(
-                      product.price - (product.price * product.discount) / 100
-                    )}{" "}
-                    FCFA
+                      selectedCurrency === "XOF" ? product.price - (product.price * product.discount) / 100
+                      : Number(product.price - (product.price * product.discount) / 100) / Number(usdRate)
+                    ).toFixed(2)}{" "}
+                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 )}
               </div>

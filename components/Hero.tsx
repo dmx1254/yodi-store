@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ShoppingCart, DollarSign, ChevronDown, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { categories } from "@/lib/sampledata";
@@ -11,10 +11,65 @@ import { usePathname } from "next/navigation";
 
 const Hero = () => {
   const pathname = usePathname();
-  const { carts, totalQuantity } = useStore();
+  const {
+    carts,
+    totalQuantity,
+    selectedCurrency,
+    usdRate,
+    setSelectedCurrency,
+    setUsdRate,
+  } = useStore();
+  // usdRate est stocké dans le store pour être utilisé ailleurs dans l'application pour la conversion des prix
   const [isOpen, setIsOpen] = useState(false);
   const [isShowCart, setIsShowCart] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+
+  // console.log(usdRate);
+  // console.log(selectedCurrency);
+
+  // Récupérer le taux de change USD au chargement
+  useEffect(() => {
+    const fetchCurrencyRate = async () => {
+      try {
+        const response = await fetch("/api/currency", {
+          cache: "force-cache",
+          next: {
+            revalidate: 60 * 60 * 1, // 1 heure
+          },
+        });
+        const data = await response.json();
+        // console.log("data", data);
+        if (data && data.rate) {
+          setUsdRate(data.rate);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération du taux de change:",
+          error
+        );
+      }
+    };
+    fetchCurrencyRate();
+  }, [setUsdRate]);
+
+  // Fermer le menu de devise en cliquant ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".currency-selector")) {
+        setIsCurrencyOpen(false);
+      }
+    };
+
+    if (isCurrencyOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCurrencyOpen]);
 
   const handleSelectId = (id: string) => {
     setSelectedId(id);
@@ -52,18 +107,134 @@ const Hero = () => {
           </Link>
         </div>
 
-        <Link
-          href="/panier"
-          className="relative bg-[#A36F5E] cursor-pointer text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:bg-[#916253]"
-          onMouseEnter={() => setIsShowCart(true)}
-        >
-          <ShoppingCart className="w-5 h-5 text-black" />
-          {totalQuantity > 0 && (
-            <span className="absolute -top-3 -right-3 p-1 flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold">
-              {totalQuantity}
-            </span>
-          )}
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/panier"
+            className="relative bg-[#A36F5E] cursor-pointer text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:bg-[#916253]"
+            onMouseEnter={() => setIsShowCart(true)}
+          >
+            <ShoppingCart className="w-5 h-5 text-black" />
+            {totalQuantity > 0 && (
+              <span className="absolute -top-3 -right-3 p-1 flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold">
+                {totalQuantity}
+              </span>
+            )}
+          </Link>
+
+          {/* Sélecteur de devise moderne */}
+          <div className="relative currency-selector">
+            <button
+              onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+              className="group relative flex items-center gap-2 bg-white/90 backdrop-blur-sm border border-gray-200 cursor-pointer text-gray-700 rounded-full px-3 py-2.5 transition-all duration-300 hover:bg-white hover:border-[#A36F5E] hover:shadow-md text-sm font-medium"
+            >
+              <Globe className="w-4 h-4 text-[#A36F5E] transition-transform duration-300 group-hover:rotate-12" />
+              <span className="font-semibold">{selectedCurrency}</span>
+              <ChevronDown
+                className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${
+                  isCurrencyOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {isCurrencyOpen && (
+              <div className="absolute right-0 top-full mt-2 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl z-50 min-w-[160px] border border-gray-200/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <button
+                  onClick={() => {
+                    setSelectedCurrency("XOF");
+                    setIsCurrencyOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${
+                    selectedCurrency === "XOF"
+                      ? "bg-[#A36F5E] text-white"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                      selectedCurrency === "XOF"
+                        ? "bg-white/20"
+                        : "bg-[#A36F5E]/10"
+                    }`}
+                  >
+                    <span className="text-xs font-bold">F</span>
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold">XOF</span>
+                    <span
+                      className={`text-xs ${selectedCurrency === "XOF" ? "text-white/80" : "text-gray-500"}`}
+                    >
+                      FCFA
+                    </span>
+                  </div>
+                  {selectedCurrency === "XOF" && (
+                    <div className="ml-auto">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+
+                <div className="h-px bg-gray-200"></div>
+
+                <button
+                  onClick={() => {
+                    setSelectedCurrency("USD");
+                    setIsCurrencyOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${
+                    selectedCurrency === "USD"
+                      ? "bg-[#A36F5E] text-white"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                      selectedCurrency === "USD"
+                        ? "bg-white/20"
+                        : "bg-[#A36F5E]/10"
+                    }`}
+                  >
+                    <DollarSign
+                      className={`w-4 h-4 ${selectedCurrency === "USD" ? "text-white" : "text-[#A36F5E]"}`}
+                    />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-semibold">USD</span>
+                    <span
+                      className={`text-xs ${selectedCurrency === "USD" ? "text-white/80" : "text-gray-500"}`}
+                    >
+                      Dollar
+                    </span>
+                  </div>
+                  {selectedCurrency === "USD" && (
+                    <div className="ml-auto">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
         {isShowCart && (
           <div
             style={{
@@ -91,14 +262,25 @@ const Hero = () => {
                       <div className="flex items-center gap-2">
                         <p className="text-xs text-[#A36F5E]">
                           {cart.quantity} *{" "}
-                          {cart.price -
-                            (cart.discount
-                              ? (cart.price * cart.discount) / 100
-                              : 0)}{" "}
-                          FCFA
+                          {selectedCurrency === "XOF"
+                            ? cart.price -
+                              (cart.discount
+                                ? (cart.price * cart.discount) / 100
+                                : 0)
+                            : Number(
+                                (cart.price -
+                                  (cart.discount
+                                    ? (cart.price * cart.discount) / 100
+                                    : 0)) /
+                                  usdRate
+                              ).toFixed(2)}
+                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                         </p>
                         <p className="text-xs text-[#A36F5E] line-through">
-                          {cart.price} FCFA
+                          {selectedCurrency === "XOF"
+                            ? cart.price
+                            : Number(cart.price / usdRate).toFixed(2)}{" "}
+                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                         </p>
                       </div>
                     </div>
@@ -116,7 +298,10 @@ const Hero = () => {
                 <div className="flex items-center my-2 gap-2">
                   <h2 className="text-xs">SOUS TOTAL:</h2>
                   <p className="text-xs text-[#A36F5E]">
-                    {Math.round(subTotal)} FCFA
+                    {selectedCurrency === "XOF"
+                      ? Math.round(subTotal)
+                      : Number(subTotal / usdRate).toFixed(2)}{" "}
+                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </p>
                 </div>
 

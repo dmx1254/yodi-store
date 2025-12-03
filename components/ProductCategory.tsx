@@ -27,7 +27,7 @@ const ProductCategory = ({ category }: { category: string }) => {
   );
   const [hasMoreProducts, setHasMoreProducts] = useState(true);
   const categoryData = categories.find((cat) => cat.slug === category);
-  const { addToCart } = useStore();
+  const { addToCart, selectedCurrency, usdRate } = useStore();
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -296,16 +296,18 @@ const ProductCategory = ({ category }: { category: string }) => {
 
                   <div className="flex items-center gap-2">
                     <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
-                      {product.price}
+                      {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                     </span>
                     <span className="text-[#262626] text-xl font-josefin font-medium">
                       {product.discount && product.discount > 0 && (
                         <span className="ml-2">
                           {Math.round(
-                            product.price -
+                            selectedCurrency === "XOF" ? product.price -
                               (product.price * product.discount) / 100
-                          )}{" "}
-                          FCFA
+                            : Number(product.price -
+                              (product.price * product.discount) / 100) / Number(usdRate)
+                          ).toFixed(2)}{" "}
+                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                         </span>
                       )}
                     </span>

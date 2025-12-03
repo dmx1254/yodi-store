@@ -7,7 +7,8 @@ import { X, Minus, Plus } from "lucide-react";
 import useStore from "@/lib/store-manage";
 
 const CartPage = () => {
-  const { carts, updateToCart, removeFromCart } = useStore();
+  const { carts, updateToCart, removeFromCart, selectedCurrency, usdRate } =
+    useStore();
   const [promoCode, setPromoCode] = useState("");
 
   // Calcul du sous-total avec remises
@@ -20,7 +21,10 @@ const CartPage = () => {
   );
 
   // Calcul du total (pour l'instant égal au sous-total, shipping à ajouter plus tard)
-  const total = subTotal;
+  const total =
+    selectedCurrency === "XOF"
+      ? subTotal
+      : Number(subTotal / Number(usdRate)).toFixed(2);
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity > 0) {
@@ -110,13 +114,26 @@ const CartPage = () => {
                     </div>
                   </td>
                   <td className="text-center text-sm py-4 px-4">
-                    <span className="line-through">{cart.price} FCFA</span>
+                    <span className="line-through">
+                      {selectedCurrency === "XOF"
+                        ? cart.price
+                        : Number(cart.price / usdRate).toFixed(2)}{" "}
+                      {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    </span>
                     {cart.discount && cart.discount > 0 && (
                       <span className="ml-2">
-                        {Math.round(
-                          cart.price - (cart.price * cart.discount) / 100
-                        )}{" "}
-                        FCFA
+                        {selectedCurrency === "XOF"
+                          ? Math.round(
+                              cart.price - (cart.price * cart.discount) / 100
+                            )
+                          : Math.round(
+                              (cart.price -
+                                (cart.discount
+                                  ? (cart.price * cart.discount) / 100
+                                  : 0)) /
+                                Number(usdRate)
+                            )}{" "}
+                        {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                       </span>
                     )}
                   </td>
@@ -144,14 +161,22 @@ const CartPage = () => {
                     </div>
                   </td>
                   <td className="text-center font-bold py-4 px-4">
-                    {Math.round(
-                      (cart.price -
-                        (cart.discount
-                          ? (cart.price * cart.discount) / 100
-                          : 0)) *
-                        cart.quantity
-                    )}{" "}
-                    FCFA
+                    {selectedCurrency === "XOF"
+                      ? Math.round(
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) *
+                            cart.quantity
+                        )
+                      : Math.round(
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) /
+                            Number(usdRate)
+                        ) * cart.quantity}{" "}
+                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </td>
                 </tr>
               ))}
@@ -200,16 +225,29 @@ const CartPage = () => {
               <div className="flex items-center justify-between mb-3">
                 <div className="text-center">
                   <span className="font-semibold text-gray-800 text-sm">
-                    {cart.price -
-                      (cart.discount
-                        ? (cart.price * cart.discount) / 100
-                        : 0)}{" "}
-                    FCFA
+                    {selectedCurrency === "XOF"
+                      ? Math.round(
+                          cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)
+                        )
+                      : Math.round(
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) /
+                            Number(usdRate)
+                        )}{" "}
+                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                   {cart.discount && cart.discount > 0 && (
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-gray-500 line-through">
-                        {cart.price} FCFA
+                        {selectedCurrency === "XOF"
+                          ? cart.price
+                          : Number(cart.price / usdRate).toFixed(2)}{" "}
+                        {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                       </span>
                       <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium">
                         -{cart.discount}%
@@ -246,14 +284,22 @@ const CartPage = () => {
                 <div className="text-right">
                   <p className="text-xs text-gray-600">Sous-total</p>
                   <p className="font-bold text-gray-800">
-                    {Math.round(
-                      (cart.price -
-                        (cart.discount
-                          ? (cart.price * cart.discount) / 100
-                          : 0)) *
-                        cart.quantity
-                    )}{" "}
-                    FCFA
+                    {selectedCurrency === "XOF"
+                      ? Math.round(
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) *
+                            cart.quantity
+                        )
+                      : Math.round(
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) /
+                            Number(usdRate)
+                        ) * cart.quantity}{" "}
+                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </p>
                 </div>
               </div>
@@ -271,7 +317,10 @@ const CartPage = () => {
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-gray-600">Sous-total</span>
               <span className="font-semibold text-gray-800">
-                {Math.round(subTotal).toLocaleString()} FCFA
+                {selectedCurrency === "XOF"
+                  ? Math.round(subTotal).toLocaleString()
+                  : Number(subTotal / usdRate).toFixed(2)}{" "}
+                {selectedCurrency === "XOF" ? "FCFA" : "USD"}
               </span>
             </div>
 
@@ -290,7 +339,10 @@ const CartPage = () => {
             <div className="flex justify-between items-center py-3 bg-gray-50 rounded-lg px-3">
               <span className="text-lg font-bold text-gray-800">Total</span>
               <span className="text-xl font-bold text-[#A36F5E]">
-                {Math.round(total).toLocaleString()} FCFA
+                {selectedCurrency === "XOF"
+                  ? Number(total).toLocaleString()
+                  : Number(total).toFixed(2)}{" "}
+                {selectedCurrency === "XOF" ? "FCFA" : "USD"}
               </span>
             </div>
           </div>

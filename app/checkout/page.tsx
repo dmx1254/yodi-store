@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import useStore from "@/lib/store-manage";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -16,10 +16,11 @@ import {
   User,
 } from "lucide-react";
 import Image from "next/image";
+import { deleliveryZones } from "@/lib/sampledata";
 
 const CheckoutPage = () => {
   const { data: session } = useSession();
-  const { carts } = useStore();
+  const { carts, selectedCurrency, usdRate } = useStore();
   const [isLoading, setIsLoading] = useState(false);
   const [lastname, setLastname] = useState(session?.user?.lastname);
   const [firstname, setFirstname] = useState(session?.user?.firstname);
@@ -29,6 +30,7 @@ const CheckoutPage = () => {
   const [delivery, setDelivery] = useState("");
   const [address, setAddress] = useState(session?.user?.address);
   const [message, setMessage] = useState("");
+  const [deliveryZones, setDeliveryZones] = useState<string[]>([]);
   // Calcul du sous-total avec remises
   const subTotal = carts.reduce(
     (acc, cart) =>
@@ -39,7 +41,10 @@ const CheckoutPage = () => {
   );
 
   const shippingCost = 1500;
-  const total = subTotal + shippingCost;
+  const total =
+    selectedCurrency === "XOF"
+      ? subTotal + shippingCost
+      : Number((subTotal + shippingCost) / Number(usdRate)).toFixed(2);
 
   const handleCheckout = async () => {
     console.log("Commande confirmée");
@@ -47,7 +52,12 @@ const CheckoutPage = () => {
     const orderData = {
       products: carts,
       shippingCost,
-      total,
+      valueCurrency: selectedCurrency === "XOF" ? 1 : Number(usdRate),
+      selectedCurrency: selectedCurrency === "XOF" ? "FCFA" : "USD",
+      total:
+        selectedCurrency === "XOF"
+          ? Number(total).toLocaleString()
+          : Number(total).toFixed(2),
       paymentMethod: "on-delivery",
       shippingInfo: {
         address,
@@ -124,6 +134,16 @@ const CheckoutPage = () => {
       setIsLoading(false);
     }
   };
+
+  useMemo(() => {
+    if (country === "senegal") {
+      setDeliveryZones(deleliveryZones.senegal);
+    } else if (country === "canada") {
+      setDeliveryZones(deleliveryZones.canada);
+    } else {
+      setDeliveryZones([]);
+    }
+  }, [country]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 lg:px-8 px-6 w-full font-josefin">
@@ -238,39 +258,8 @@ const CheckoutPage = () => {
                     required
                   >
                     <option value="">Sélectionnez votre pays</option>
-                    <option value="Sénégal">Sénégal</option>
-                    <option value="Canada">Canada</option>
-                    <option value="France">France</option>
-                    <option value="Belgique">Belgique</option>
-                    <option value="Mali">Mali</option>
-                    <option value="Côte d'Ivoire">Côte d&apos;Ivoire</option>
-                    <option value="Guinée">Guinée</option>
-                    <option value="Sierra Leone">Sierra Leone</option>
-                    <option value="Liberia">Liberia</option>
-                    <option value="Gambie">Gambie</option>
-                    <option value="Guinée-Bissau">Guinée-Bissau</option>
-                    <option value="Mauritanie">Mauritanie</option>
-                    <option value="Luxembourg">Luxembourg</option>
-                    <option value="Suisse">Suisse</option>
-                    <option value="Allemagne">Allemagne</option>
-                    <option value="Italie">Italie</option>
-                    <option value="Espagne">Espagne</option>
-                    <option value="Portugal">Portugal</option>
-                    <option value="Grèce">Grèce</option>
-                    <option value="Turquie">Turquie</option>
-                    <option value="Maroc">Maroc</option>
-                    <option value="Algérie">Algérie</option>
-                    <option value="Tunisie">Tunisie</option>
-                    <option value="Egypte">Egypte</option>
-                    <option value="Jordanie">Jordanie</option>
-                    <option value="Arabie Saoudite">Arabie Saoudite</option>
-                    <option value="Oman">Oman</option>
-                    <option value="Qatar">Qatar</option>
-                    <option value="Bahreïn">Bahreïn</option>
-                    <option value="Koweït">Koweït</option>
-                    <option value="Emirats Arabes Unis">
-                      Emirats Arabes Unis
-                    </option>
+                    <option value="senegal">Sénégal</option>
+                    <option value="canada">Canada</option>
                   </select>
                 </div>
               </div>
@@ -325,31 +314,9 @@ const CheckoutPage = () => {
                     required
                   >
                     <option value="">Choisissez votre zone</option>
-                    <option value="Mermoz">Mermoz</option>
-                    <option value="VDN">VDN</option>
-                    <option value="Liberté 6">Liberté 6</option>
-                    <option value="Sacré Cœur">Sacré Cœur</option>
-                    <option value="Baobab">Baobab</option>
-                    <option value="Point E">Point E</option>
-                    <option value="Yoff">Yoff</option>
-                    <option value="Pikine">Pikine</option>
-                    <option value="Medina">Medina</option>
-                    <option value="Rufisque">Rufisque</option>
-                    <option value="Grand Yoff">Grand Yoff</option>
-                    <option value="Colobane">Colobane</option>
-                    <option value="Grand Dakar">Grand Dakar</option>
-                    <option value="HLM">HLM</option>
-                    <option value="Ouakam">Ouakam</option>
-                    <option value="Almadies">Almadies</option>
-                    <option value="Parcelles Assainies">
-                      Parcelles Assainies
-                    </option>
-                    <option value="Ouest foire">Ouest foire</option>
-                    <option value="Nord foire">Nord foire</option>
-                    <option value="Mbao">Mbao</option>
-                    <option value="Keur Massar">Keur Massar</option>
-                    <option value="Patte d'oie">Patte d&apos;oie</option>
-                    <option value="Ngor">Ngor</option>
+                    {deliveryZones.map((zone) => (
+                      <option key={zone} value={zone}>{zone}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -554,14 +521,23 @@ const CheckoutPage = () => {
                       </p>
                     </div>
                     <span className="text-sm font-semibold text-gray-800 ml-2">
-                      {Math.round(
-                        (cart.price -
-                          (cart.discount
-                            ? (cart.price * cart.discount) / 100
-                            : 0)) *
-                          cart.quantity
-                      )}{" "}
-                      FCFA
+                      {selectedCurrency === "XOF"
+                        ? Math.round(
+                            (cart.price -
+                              (cart.discount
+                                ? (cart.price * cart.discount) / 100
+                                : 0)) *
+                              cart.quantity
+                          )
+                        : Math.round(
+                            ((cart.price -
+                              (cart.discount
+                                ? (cart.price * cart.discount) / 100
+                                : 0)) *
+                              cart.quantity) /
+                              Number(usdRate)
+                          )}
+                      {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                     </span>
                   </div>
                 ))}
@@ -572,21 +548,21 @@ const CheckoutPage = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Sous-total</span>
                   <span className="font-semibold text-gray-800">
-                    {Math.round(subTotal).toLocaleString()} FCFA
+                    {selectedCurrency === "XOF" ? Math.round(subTotal).toLocaleString() : Number(subTotal / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Expédition</span>
                   <span className="font-semibold text-gray-800">
-                    Frais de livraison: {shippingCost.toLocaleString()} FCFA
+                    Frais de livraison: {selectedCurrency === "XOF" ? shippingCost.toLocaleString() : Number(shippingCost / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-3 bg-gray-50 rounded-xl px-4">
                   <span className="text-lg font-bold text-gray-800">Total</span>
                   <span className="text-xl font-bold text-[#A36F5E]">
-                    {Math.round(total).toLocaleString()} FCFA
+                   {total} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
               </div>
