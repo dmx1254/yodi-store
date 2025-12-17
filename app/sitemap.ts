@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://yodistore.vercel.app'
+  const baseUrl = 'https://yyodi-store.com'
   const currentDate = new Date().toISOString().split('T')[0]
 
   // Pages statiques principales

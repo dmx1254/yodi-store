@@ -6,7 +6,7 @@
 
   <!-- Page d'accueil -->
   <url>
-    <loc>https://yodistore.vercel.app/</loc>
+    <loc>https://yyodi-store.com/</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,21 +14,21 @@
 
   <!-- Pages d'authentification -->
   <url>
-    <loc>https://yodistore.vercel.app/connexion</loc>
+    <loc>https://yyodi-store.com/connexion</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/inscription</loc>
+    <loc>https://yyodi-store.com/inscription</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/mot-de-passe-oublie</loc>
+    <loc>https://yyodi-store.com/mot-de-passe-oublie</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -36,14 +36,14 @@
 
   <!-- Pages de profil (nécessitent authentification) -->
   <url>
-    <loc>https://yodistore.vercel.app/profile</loc>
+    <loc>https://yyodi-store.com/profile</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/profile/commandes</loc>
+    <loc>https://yyodi-store.com/profile/commandes</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -51,14 +51,14 @@
 
   <!-- Pages de commande -->
   <url>
-    <loc>https://yodistore.vercel.app/panier</loc>
+    <loc>https://yyodi-store.com/panier</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/checkout</loc>
+    <loc>https://yyodi-store.com/checkout</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -66,7 +66,7 @@
 
   <!-- Pages légales -->
   <url>
-    <loc>https://yodistore.vercel.app/condition-dutilisations</loc>
+    <loc>https://yyodi-store.com/condition-dutilisations</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -74,42 +74,42 @@
 
   <!-- Catégories de produits -->
   <url>
-    <loc>https://yodistore.vercel.app/tisane-detox</loc>
+    <loc>https://yyodi-store.com/tisane-detox</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/savon</loc>
+    <loc>https://yyodi-store.com/savon</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/tisane-digestive</loc>
+    <loc>https://yyodi-store.com/tisane-digestive</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/baume-barbe</loc>
+    <loc>https://yyodi-store.com/baume-barbe</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/cheveux</loc>
+        <loc>https://yyodi-store.com/cheveux</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://yodistore.vercel.app/huile-a-barbe</loc>
+    <loc>https://yyodi-store.com/huile-a-barbe</loc>
     <lastmod>2024-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>

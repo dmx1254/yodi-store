@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://yodistore.vercel.app/sitemap.xml
+Sitemap: https://yyodi-store.com/sitemap.xml
 
 # Pages à ne pas indexer (authentification et profil)
 Disallow: /connexion
