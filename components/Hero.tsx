@@ -272,14 +272,14 @@ const Hero = () => {
                                   (cart.discount
                                     ? (cart.price * cart.discount) / 100
                                     : 0)) /
-                                  usdRate
+                                  Number(usdRate || 1)
                               ).toFixed(2)}
                           {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                         </p>
                         <p className="text-xs text-[#A36F5E] line-through">
                           {selectedCurrency === "XOF"
                             ? cart.price
-                            : Number(cart.price / usdRate).toFixed(2)}{" "}
+                            : Number(cart.price / Number(usdRate || 1)).toFixed(2)}{" "}
                           {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                         </p>
                       </div>
@@ -300,7 +300,7 @@ const Hero = () => {
                   <p className="text-xs text-[#A36F5E]">
                     {selectedCurrency === "XOF"
                       ? Math.round(subTotal)
-                      : Number(subTotal / usdRate).toFixed(2)}{" "}
+                      : Number(subTotal / Number(usdRate || 1)).toFixed(2)}{" "}
                     {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </p>
                 </div>

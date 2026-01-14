@@ -136,6 +136,16 @@ export const categories: Category[] = [
       },
     ],
   },
+  {
+    id: "lzqp9t",
+    title: "Bain & Corps",
+    slug: "bain-corps",
+  },
+  {
+    id: "b51k0j",
+    title: "Bebe & Maman",
+    slug: "bebe-maman",
+  }
 ];
 
 export const productMock = {
@@ -375,7 +385,7 @@ export const deleliveryZones = {
     "Patte d'oie",
     "Ngor",
   ],
-  canada:[
+  canada: [
     "Montreal",
     "Toronto",
     "Vancouver",
@@ -385,5 +395,5 @@ export const deleliveryZones = {
     "Hamilton",
     "Ottawa",
     "Quebec City",
-  ]
+  ],
 };

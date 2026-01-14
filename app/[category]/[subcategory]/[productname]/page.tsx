@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { IProduct } from "@/lib/models/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { trackViewContent, trackAddToCart } from "@/components/MetaPixel";
 
 const ProductDetailPage = () => {
   const { addToCart, selectedCurrency, usdRate } = useStore();
@@ -37,6 +38,22 @@ const ProductDetailPage = () => {
     fetchProduct();
   }, [productname]);
 
+  // Meta Pixel: Track ViewContent when product loads
+  useEffect(() => {
+    if (product && !loading) {
+      const finalPrice = product.discount
+        ? product.price - (product.price * product.discount) / 100
+        : product.price;
+      trackViewContent({
+        id: product._id as string,
+        name: product.title,
+        category: product.category,
+        price: finalPrice,
+        currency: selectedCurrency,
+      });
+    }
+  }, [product, loading, selectedCurrency]);
+
   // Simuler un produit (remplacez par la vraie logique de récupération)
 
   const increaseQuantity = () => setQuantity((prev) => prev + 1);
@@ -50,6 +67,19 @@ const ProductDetailPage = () => {
       id: product._id as string,
     };
     addToCart(newProduct);
+
+    // Meta Pixel: Track AddToCart event
+    const finalPrice = product.discount
+      ? product.price - (product.price * product.discount) / 100
+      : product.price;
+    trackAddToCart({
+      id: product._id as string,
+      name: product.title,
+      price: finalPrice,
+      quantity: quantity,
+      currency: selectedCurrency,
+    });
+
     toast.success("Produit ajouté au panier", {
       style: {
         color: "#10b981",
@@ -288,13 +318,13 @@ const ProductDetailPage = () => {
               {/* Prix */}
               <div className="flex items-center gap-4">
                 <span className="text-[#A36F5E] line-through text-lg font-medium">
-                  {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                  {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                 </span>
                 {product.discount && (
                   <span className="text-[#A36F5E] text-2xl font-bold">
                     {Math.round(
                       selectedCurrency === "XOF" ? product.price - (product.price * product.discount) / 100
-                      : Number(product.price - (product.price * product.discount) / 100) / Number(usdRate)
+                        : Number(product.price - (product.price * product.discount) / 100) / Number(usdRate || 1)
                     ).toFixed(2)}{" "}
                     {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
@@ -388,11 +418,10 @@ const ProductDetailPage = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`py-2 px-1 text-xs font-semibold transition-colors ${
-                        activeTab === tab.id
-                          ? "border-[#A36F5E] border-b-2 text-[#A36F5E] font-medium"
-                          : "border-transparent text-gray-600 hover:text-gray-800"
-                      }`}
+                      className={`py-2 px-1 text-xs font-semibold transition-colors ${activeTab === tab.id
+                        ? "border-[#A36F5E] border-b-2 text-[#A36F5E] font-medium"
+                        : "border-transparent text-gray-600 hover:text-gray-800"
+                        }`}
                     >
                       {tab.label}
                     </button>

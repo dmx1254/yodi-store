@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useStore from "@/lib/store-manage";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { deleliveryZones } from "@/lib/sampledata";
+import { trackInitiateCheckout, trackPurchase } from "@/components/MetaPixel";
 
 const CheckoutPage = () => {
   const { data: session } = useSession();
@@ -36,7 +37,7 @@ const CheckoutPage = () => {
     (acc, cart) =>
       acc +
       (cart.price - (cart.discount ? (cart.price * cart.discount) / 100 : 0)) *
-        cart.quantity,
+      cart.quantity,
     0
   );
 
@@ -44,7 +45,19 @@ const CheckoutPage = () => {
   const total =
     selectedCurrency === "XOF"
       ? subTotal + shippingCost
-      : Number((subTotal + shippingCost) / Number(usdRate)).toFixed(2);
+      : Number((subTotal + shippingCost) / Number(usdRate || 1)).toFixed(2);
+
+  // Meta Pixel: Track InitiateCheckout when page loads
+  useEffect(() => {
+    if (carts.length > 0) {
+      trackInitiateCheckout({
+        value: subTotal,
+        currency: selectedCurrency,
+        num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
+        content_ids: carts.map((cart) => cart.id),
+      });
+    }
+  }, []); // Only track once on page load
 
   const handleCheckout = async () => {
     console.log("Commande confirmée");
@@ -105,6 +118,15 @@ const CheckoutPage = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        // Meta Pixel: Track Purchase event
+        trackPurchase({
+          value: Number(total),
+          currency: selectedCurrency,
+          content_ids: carts.map((cart) => cart.id),
+          num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
+          order_id: data.orderId || "",
+        });
+
         toast.success(
           "Commande confirmée, nous vous contacterons dans les prochaines heures.",
           {
@@ -523,20 +545,20 @@ const CheckoutPage = () => {
                     <span className="text-sm font-semibold text-gray-800 ml-2">
                       {selectedCurrency === "XOF"
                         ? Math.round(
-                            (cart.price -
-                              (cart.discount
-                                ? (cart.price * cart.discount) / 100
-                                : 0)) *
-                              cart.quantity
-                          )
+                          (cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) *
+                          cart.quantity
+                        )
                         : Math.round(
-                            ((cart.price -
-                              (cart.discount
-                                ? (cart.price * cart.discount) / 100
-                                : 0)) *
-                              cart.quantity) /
-                              Number(usdRate)
-                          )}
+                          ((cart.price -
+                            (cart.discount
+                              ? (cart.price * cart.discount) / 100
+                              : 0)) *
+                            cart.quantity) /
+                          Number(usdRate || 1)
+                        )}
                       {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                     </span>
                   </div>
@@ -548,21 +570,21 @@ const CheckoutPage = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Sous-total</span>
                   <span className="font-semibold text-gray-800">
-                    {selectedCurrency === "XOF" ? Math.round(subTotal).toLocaleString() : Number(subTotal / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    {selectedCurrency === "XOF" ? Math.round(subTotal).toLocaleString() : Number(subTotal / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">Expédition</span>
                   <span className="font-semibold text-gray-800">
-                    Frais de livraison: {selectedCurrency === "XOF" ? shippingCost.toLocaleString() : Number(shippingCost / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    Frais de livraison: {selectedCurrency === "XOF" ? shippingCost.toLocaleString() : Number(shippingCost / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-3 bg-gray-50 rounded-xl px-4">
                   <span className="text-lg font-bold text-gray-800">Total</span>
                   <span className="text-xl font-bold text-[#A36F5E]">
-                   {total} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    {total} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                 </div>
               </div>

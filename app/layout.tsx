@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import { Toaster } from "sonner";
 import { ProviderSession } from "@/components/ProviderSession";
+import MetaPixel from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -79,6 +80,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        <MetaPixel />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${josefinSans.variable} ${playfairDisplay.variable} antialiased bg-white h-full`}
       >

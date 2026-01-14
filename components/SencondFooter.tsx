@@ -8,6 +8,8 @@ import {
   FaWhatsapp,
   FaShippingFast,
   FaCreditCard,
+  FaTiktok,
+  FaSnapchat,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import Image from "next/image";
@@ -99,22 +101,22 @@ const SencondFooter = () => {
                   href="tel:+221789689698"
                   className="text-sm text-gray-600 font-josefin"
                 >
-                 S/N +221 78 968 96 98
+                  S/N +221 78 968 96 98
                 </a>
-                
+
                 <br />
                 <a
                   href="tel:+18192908365"
                   className="text-sm text-gray-600 font-josefin"
                 >
-                 C/N +1 81 9 2 908365
+                  C/N +1 81 9 2 908365
                 </a>
                 <br />
                 <a
                   href="tel:+18192908365"
                   className="text-sm text-gray-600 font-josefin"
                 >
-                 Num. commercial : +221 78 012 84 86
+                  Num. commercial : +221 78 012 84 86
                 </a>
               </div>
             </div>
@@ -193,7 +195,7 @@ const SencondFooter = () => {
               </h3>
               <div className="flex gap-3">
                 <a
-                  href="https://www.facebook.com/yodi.store"
+                  href="https://www.facebook.com/yyodistores"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 bg-[#A36F5E] rounded-full flex items-center justify-center hover:bg-[#916253] transition-colors"
@@ -217,12 +219,20 @@ const SencondFooter = () => {
                   <FaWhatsapp className="w-5 h-5 text-green-600" />
                 </a>
                 <a
-                  href="https://x.com/yodi_store"
+                  href="https://tiktok.com/@yyodi2"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-8 h-8 bg-[#A36F5E] rounded-full flex items-center justify-center hover:bg-[#916253] transition-colors"
                 >
-                  <FaXTwitter className="w-5 h-5 text-black" />
+                  <FaTiktok className="w-5 h-5 text-black" />
+                </a>
+                <a
+                  href="https://www.snapchat.com/add/yyodi-store"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 bg-[#A36F5E] rounded-full flex items-center justify-center hover:bg-[#916253] transition-colors"
+                >
+                  <FaSnapchat className="w-5 h-5 text-yellow-400" />
                 </a>
               </div>
             </div>

@@ -24,7 +24,7 @@ const CartPage = () => {
   const total =
     selectedCurrency === "XOF"
       ? subTotal
-      : Number(subTotal / Number(usdRate)).toFixed(2);
+      : Number(subTotal / Number(usdRate || 1)).toFixed(2);
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity > 0) {
@@ -117,7 +117,7 @@ const CartPage = () => {
                     <span className="line-through">
                       {selectedCurrency === "XOF"
                         ? cart.price
-                        : Number(cart.price / usdRate).toFixed(2)}{" "}
+                        : Number(cart.price / Number(usdRate || 1)).toFixed(2)}{" "}
                       {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                     </span>
                     {cart.discount && cart.discount > 0 && (
@@ -131,7 +131,7 @@ const CartPage = () => {
                                 (cart.discount
                                   ? (cart.price * cart.discount) / 100
                                   : 0)) /
-                                Number(usdRate)
+                                Number(usdRate || 1)
                             )}{" "}
                         {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                       </span>
@@ -174,7 +174,7 @@ const CartPage = () => {
                             (cart.discount
                               ? (cart.price * cart.discount) / 100
                               : 0)) /
-                            Number(usdRate)
+                            Number(usdRate || 1)
                         ) * cart.quantity}{" "}
                     {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </td>
@@ -237,7 +237,7 @@ const CartPage = () => {
                             (cart.discount
                               ? (cart.price * cart.discount) / 100
                               : 0)) /
-                            Number(usdRate)
+                            Number(usdRate || 1)
                         )}{" "}
                     {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
@@ -246,7 +246,7 @@ const CartPage = () => {
                       <span className="text-xs text-gray-500 line-through">
                         {selectedCurrency === "XOF"
                           ? cart.price
-                          : Number(cart.price / usdRate).toFixed(2)}{" "}
+                          : Number(cart.price / Number(usdRate || 1)).toFixed(2)}{" "}
                         {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                       </span>
                       <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full font-medium">
@@ -297,7 +297,7 @@ const CartPage = () => {
                             (cart.discount
                               ? (cart.price * cart.discount) / 100
                               : 0)) /
-                            Number(usdRate)
+                            Number(usdRate || 1)
                         ) * cart.quantity}{" "}
                     {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </p>
@@ -319,7 +319,7 @@ const CartPage = () => {
               <span className="font-semibold text-gray-800">
                 {selectedCurrency === "XOF"
                   ? Math.round(subTotal).toLocaleString()
-                  : Number(subTotal / usdRate).toFixed(2)}{" "}
+                  : Number(subTotal / Number(usdRate || 1)).toFixed(2)}{" "}
                 {selectedCurrency === "XOF" ? "FCFA" : "USD"}
               </span>
             </div>

@@ -8,6 +8,7 @@ import Link from "next/link";
 import useStore from "@/lib/store-manage";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { trackAddToCart } from "@/components/MetaPixel";
 
 interface PaginationInfo {
   currentPage: number;
@@ -129,6 +130,19 @@ const ProductSubcategory = ({
   const handleAddToCart = (product: IProduct) => {
     const newProduct = { ...product, quantity: 1, id: product._id as string };
     addToCart(newProduct);
+
+    // Meta Pixel: Track AddToCart event
+    const finalPrice = product.discount
+      ? product.price - (product.price * product.discount) / 100
+      : product.price;
+    trackAddToCart({
+      id: product._id as string,
+      name: product.title,
+      price: finalPrice,
+      quantity: 1,
+      currency: selectedCurrency,
+    });
+
     toast.success("Produit ajouté au panier", {
       duration: 3000,
       style: {
@@ -166,73 +180,73 @@ const ProductSubcategory = ({
       <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-12 mb-6">
         {loading
           ? Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="flex flex-col h-full">
-                <div className="flex-1 flex flex-col items-center gap-3">
-                  <div className="w-72 h-64 bg-gray-200 animate-pulse rounded-md">
-                    <Skeleton className="w-72 h-64" />
-                    <Skeleton className="w-72 h-4" />
-                    <Skeleton className="w-72 h-4" />
-                  </div>
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-full h-4" />
+            <div key={index} className="flex flex-col h-full">
+              <div className="flex-1 flex flex-col items-center gap-3">
+                <div className="w-72 h-64 bg-gray-200 animate-pulse rounded-md">
+                  <Skeleton className="w-72 h-64" />
+                  <Skeleton className="w-72 h-4" />
+                  <Skeleton className="w-72 h-4" />
+                </div>
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-full h-4" />
+              </div>
+            </div>
+          ))
+          : products.map((product) => (
+            <Link
+              href={`/${category}/${subcategory}/${product._id}`}
+              key={product.id}
+              className="flex flex-col h-full"
+            >
+              {/* Contenu principal avec flex-1 pour occuper l'espace disponible */}
+              <div className="flex-1 flex flex-col items-center gap-3">
+                <Image
+                  src={product.imageUrl}
+                  alt={product.title}
+                  width={220}
+                  height={220}
+                  className="w-72 h-64 object-cover object-center"
+                />
+                <p className="text-black text-sm font-josefin text-center">
+                  {product.title}
+                </p>
+                <p className="text-black text-xs font-josefin text-center line-clamp-2">
+                  {product.description}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
+                      {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                  </span>
+                  <span className="text-[#262626] text-xl font-josefin font-medium">
+                    {product.discount && product.discount > 0 && (
+                      <span className="ml-2">
+                        {Math.round(
+                          selectedCurrency === "XOF" ? product.price -
+                            (product.price * product.discount) / 100
+                            : Number(product.price -
+                              (product.price * product.discount) / 100) / Number(usdRate || 1)
+                        ).toFixed(2)}{" "}
+                        {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                      </span>
+                    )}
+                  </span>
                 </div>
               </div>
-            ))
-          : products.map((product) => (
-              <Link
-                href={`/${category}/${subcategory}/${product._id}`}
-                key={product.id}
-                className="flex flex-col h-full"
-              >
-                {/* Contenu principal avec flex-1 pour occuper l'espace disponible */}
-                <div className="flex-1 flex flex-col items-center gap-3">
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.title}
-                    width={220}
-                    height={220}
-                    className="w-72 h-64 object-cover object-center"
-                  />
-                  <p className="text-black text-sm font-josefin text-center">
-                    {product.title}
-                  </p>
-                  <p className="text-black text-xs font-josefin text-center line-clamp-2">
-                    {product.description}
-                  </p>
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
-                      {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                    </span>
-                    <span className="text-[#262626] text-xl font-josefin font-medium">
-                      {product.discount && product.discount > 0 && (
-                        <span className="ml-2">
-                          {Math.round(
-                            selectedCurrency === "XOF" ? product.price -
-                              (product.price * product.discount) / 100
-                            : Number(product.price -
-                              (product.price * product.discount) / 100) / Number(usdRate)
-                          ).toFixed(2)}{" "}
-                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-auto pt-4">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleAddToCart(product);
-                    }}
-                    className="bg-[#A36F5E] cursor-pointer text-white px-4 py-2 rounded-md text-sm font-josefin font-medium w-full transition-all duration-300 hover:bg-[#916253]"
-                  >
-                    Ajouter au panier
-                  </button>
-                </div>
-              </Link>
-            ))}
+              <div className="mt-auto pt-4">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddToCart(product);
+                  }}
+                  className="bg-[#A36F5E] cursor-pointer text-white px-4 py-2 rounded-md text-sm font-josefin font-medium w-full transition-all duration-300 hover:bg-[#916253]"
+                >
+                  Ajouter au panier
+                </button>
+              </div>
+            </Link>
+          ))}
       </div>
 
       {/* Élément de déclenchement pour la pagination infinie */}
