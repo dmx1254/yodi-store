@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { deleliveryZones } from "@/lib/sampledata";
-import { trackInitiateCheckout, trackPurchase } from "@/components/MetaPixel";
+import { trackInitiateCheckout, trackPurchase, trackAddPaymentInfo, sendToCAPI } from "@/components/MetaPixel";
 
 const CheckoutPage = () => {
   const { data: session } = useSession();
@@ -50,12 +50,21 @@ const CheckoutPage = () => {
   // Meta Pixel: Track InitiateCheckout when page loads
   useEffect(() => {
     if (carts.length > 0) {
-      trackInitiateCheckout({
+      const eventId = trackInitiateCheckout({
         value: subTotal,
         currency: selectedCurrency,
         num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
         content_ids: carts.map((cart) => cart.id),
       });
+
+      // Send to CAPI for better tracking reliability
+      sendToCAPI("InitiateCheckout", {
+        content_ids: carts.map((cart) => cart.id),
+        content_type: "product",
+        value: subTotal,
+        currency: selectedCurrency,
+        num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
+      }, eventId);
     }
   }, []); // Only track once on page load
 
@@ -119,13 +128,23 @@ const CheckoutPage = () => {
       const data = await response.json();
       if (response.ok) {
         // Meta Pixel: Track Purchase event
-        trackPurchase({
+        const eventId = trackPurchase({
           value: Number(total),
           currency: selectedCurrency,
           content_ids: carts.map((cart) => cart.id),
           num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
           order_id: data.orderId || "",
         });
+
+        // Send to CAPI for better tracking reliability
+        sendToCAPI("Purchase", {
+          content_ids: carts.map((cart) => cart.id),
+          content_type: "product",
+          value: Number(total),
+          currency: selectedCurrency,
+          num_items: carts.reduce((acc, cart) => acc + cart.quantity, 0),
+          order_id: data.orderId || "",
+        }, eventId);
 
         toast.success(
           "Commande confirmée, nous vous contacterons dans les prochaines heures.",

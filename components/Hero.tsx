@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ShoppingCart, DollarSign, ChevronDown, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,6 +24,31 @@ const Hero = () => {
   const [isShowCart, setIsShowCart] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+  const cartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Handlers pour le mini-panier avec délai de fermeture
+  const handleCartMouseEnter = () => {
+    if (cartTimeoutRef.current) {
+      clearTimeout(cartTimeoutRef.current);
+      cartTimeoutRef.current = null;
+    }
+    setIsShowCart(true);
+  };
+
+  const handleCartMouseLeave = () => {
+    cartTimeoutRef.current = setTimeout(() => {
+      setIsShowCart(false);
+    }, 150); // Délai de 150ms pour permettre le passage de l'icône au popup
+  };
+
+  // Cleanup du timeout au démontage
+  useEffect(() => {
+    return () => {
+      if (cartTimeoutRef.current) {
+        clearTimeout(cartTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // console.log(usdRate);
   // console.log(selectedCurrency);
@@ -79,7 +104,7 @@ const Hero = () => {
     (acc, cart) =>
       acc +
       (cart.price - (cart.discount ? (cart.price * cart.discount) / 100 : 0)) *
-        cart.quantity,
+      cart.quantity,
     0
   );
 
@@ -108,18 +133,106 @@ const Hero = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/panier"
-            className="relative bg-[#A36F5E] cursor-pointer text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:bg-[#916253]"
-            onMouseEnter={() => setIsShowCart(true)}
+          {/* Mini-cart container - relative pour positionner le dropdown */}
+          <div
+            className="relative z-[60]"
+            onMouseEnter={handleCartMouseEnter}
+            onMouseLeave={handleCartMouseLeave}
           >
-            <ShoppingCart className="w-5 h-5 text-black" />
-            {totalQuantity > 0 && (
-              <span className="absolute -top-3 -right-3 p-1 flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold">
-                {totalQuantity}
-              </span>
+            <Link
+              href="/panier"
+              className="relative flex items-center justify-center bg-[#A36F5E] cursor-pointer text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:bg-[#916253]"
+            >
+              <ShoppingCart className="w-5 h-5 text-black" />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold">
+                  {totalQuantity}
+                </span>
+              )}
+            </Link>
+
+            {/* Mini-Panier Dropdown */}
+            {isShowCart && (
+              <div
+                className="absolute top-full right-0 mt-2 z-50 w-80 bg-white rounded-lg shadow-xl border border-gray-100 font-josefin"
+              >
+                {carts.length < 1 ? (
+                  <div className="flex flex-col items-center justify-center p-6">
+                    <ShoppingCart className="w-8 h-8 text-gray-300 mb-2" />
+                    <p className="text-sm text-gray-500">Votre panier est vide</p>
+                  </div>
+                ) : (
+                  <div className="p-4">
+                    {/* Liste des produits */}
+                    <div className="max-h-64 overflow-y-auto space-y-3">
+                      {carts.map((cart) => (
+                        <div
+                          key={cart.id}
+                          className="flex items-start gap-3 pb-3 border-b border-gray-100 last:border-0"
+                        >
+                          <Image
+                            src={cart.imageUrl}
+                            alt={cart.title}
+                            width={60}
+                            height={60}
+                            className="w-14 h-14 object-cover rounded-md flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-medium text-gray-800 line-clamp-2">
+                              {cart.title}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-[#A36F5E] font-semibold">
+                                {cart.quantity} ×{" "}
+                                {selectedCurrency === "XOF"
+                                  ? Math.round(cart.price - (cart.discount ? (cart.price * cart.discount) / 100 : 0))
+                                  : Number((cart.price - (cart.discount ? (cart.price * cart.discount) / 100 : 0)) / Number(usdRate || 1)).toFixed(2)}
+                                {selectedCurrency === "XOF" ? " FCFA" : " USD"}
+                              </span>
+                              {cart.discount && cart.discount > 0 && (
+                                <span className="text-xs text-gray-400 line-through">
+                                  {selectedCurrency === "XOF"
+                                    ? cart.price
+                                    : Number(cart.price / Number(usdRate || 1)).toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Sous-total */}
+                    <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-200">
+                      <span className="text-sm font-medium text-gray-600">Sous-total</span>
+                      <span className="text-base font-bold text-[#A36F5E]">
+                        {selectedCurrency === "XOF"
+                          ? Math.round(subTotal).toLocaleString("fr-FR")
+                          : Number(subTotal / Number(usdRate || 1)).toFixed(2)}{" "}
+                        {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                      </span>
+                    </div>
+
+                    {/* Boutons */}
+                    <div className="flex gap-2 mt-4">
+                      <Link
+                        href="/panier"
+                        className="flex-1 py-2.5 text-center text-sm font-semibold text-[#A36F5E] border border-[#A36F5E] rounded-full hover:bg-[#A36F5E] hover:text-white transition-colors duration-300"
+                      >
+                        Voir le panier
+                      </Link>
+                      <Link
+                        href="/checkout"
+                        className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-[#A36F5E] rounded-full hover:bg-[#916253] transition-colors duration-300"
+                      >
+                        Commander
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
-          </Link>
+          </div>
 
           {/* Sélecteur de devise moderne */}
           <div className="relative currency-selector">
@@ -130,9 +243,8 @@ const Hero = () => {
               <Globe className="w-4 h-4 text-[#A36F5E] transition-transform duration-300 group-hover:rotate-12" />
               <span className="font-semibold">{selectedCurrency}</span>
               <ChevronDown
-                className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${
-                  isCurrencyOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${isCurrencyOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -143,18 +255,16 @@ const Hero = () => {
                     setSelectedCurrency("XOF");
                     setIsCurrencyOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${
-                    selectedCurrency === "XOF"
-                      ? "bg-[#A36F5E] text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${selectedCurrency === "XOF"
+                    ? "bg-[#A36F5E] text-white"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <div
-                    className={`flex items-center justify-center w-6 h-6 rounded-full ${
-                      selectedCurrency === "XOF"
-                        ? "bg-white/20"
-                        : "bg-[#A36F5E]/10"
-                    }`}
+                    className={`flex items-center justify-center w-6 h-6 rounded-full ${selectedCurrency === "XOF"
+                      ? "bg-white/20"
+                      : "bg-[#A36F5E]/10"
+                      }`}
                   >
                     <span className="text-xs font-bold">F</span>
                   </div>
@@ -190,18 +300,16 @@ const Hero = () => {
                     setSelectedCurrency("USD");
                     setIsCurrencyOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${
-                    selectedCurrency === "USD"
-                      ? "bg-[#A36F5E] text-white"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-all duration-200 ${selectedCurrency === "USD"
+                    ? "bg-[#A36F5E] text-white"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <div
-                    className={`flex items-center justify-center w-6 h-6 rounded-full ${
-                      selectedCurrency === "USD"
-                        ? "bg-white/20"
-                        : "bg-[#A36F5E]/10"
-                    }`}
+                    className={`flex items-center justify-center w-6 h-6 rounded-full ${selectedCurrency === "USD"
+                      ? "bg-white/20"
+                      : "bg-[#A36F5E]/10"
+                      }`}
                   >
                     <DollarSign
                       className={`w-4 h-4 ${selectedCurrency === "USD" ? "text-white" : "text-[#A36F5E]"}`}
@@ -235,128 +343,88 @@ const Hero = () => {
             )}
           </div>
         </div>
-        {isShowCart && (
-          <div
-            style={{
-              boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
-            }}
-            className="absolute right-[15%] top-[38%] z-40 font-josefin transform -translate-y-1/2 bg-white w-full flex flex-col items-start max-w-80 rounded-lg p-4"
-            onMouseLeave={() => setIsShowCart(false)}
-          >
-            {carts.length < 1 ? (
-              <div className="flex flex-col items-center justify-center h-full">
-                <h2 className="text-xs">Votre panier est vide</h2>
-              </div>
-            ) : (
-              <>
-                {carts.map((cart) => (
-                  <div
-                    key={cart.id}
-                    className="flex items-start justify-between gap-4 pb-4"
-                    style={{
-                      borderBottom: "1px solid #E0E0E0",
-                    }}
-                  >
-                    <div className="flex flex-col items-start">
-                      <h2 className="text-xs">{cart.title}</h2>
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs text-[#A36F5E]">
-                          {cart.quantity} *{" "}
-                          {selectedCurrency === "XOF"
-                            ? cart.price -
-                              (cart.discount
-                                ? (cart.price * cart.discount) / 100
-                                : 0)
-                            : Number(
-                                (cart.price -
-                                  (cart.discount
-                                    ? (cart.price * cart.discount) / 100
-                                    : 0)) /
-                                  Number(usdRate || 1)
-                              ).toFixed(2)}
-                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                        </p>
-                        <p className="text-xs text-[#A36F5E] line-through">
-                          {selectedCurrency === "XOF"
-                            ? cart.price
-                            : Number(cart.price / Number(usdRate || 1)).toFixed(2)}{" "}
-                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="">
-                      <Image
-                        src={cart.imageUrl}
-                        alt={cart.title}
-                        width={200}
-                        height={200}
-                        className="w-20 h-16 object-cover"
-                      />
-                    </div>
+
+      </div>
+
+      {/* Premium Category Menu */}
+      <nav className="md:flex hidden items-center justify-center relative z-50">
+        <div className="flex items-center gap-0 bg-white/50 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-gray-100/50">
+          {categories.map((category, index) => (
+            <div
+              key={category.id}
+              onMouseEnter={() => {
+                handleSelectId(category.id);
+                setIsOpen(true);
+              }}
+              onMouseLeave={() => {
+                setIsOpen(false);
+                setSelectedId(null);
+              }}
+              className="relative group"
+            >
+              <Link
+                href={`/${category.slug}`}
+                className={`
+                  relative block px-4 py-3 text-sm font-medium tracking-wide
+                  transition-all duration-300 ease-out
+                  ${selectedId === category.id
+                    ? 'text-white bg-[#A36F5E] rounded-full'
+                    : 'text-gray-700 hover:text-[#A36F5E]'
+                  }
+                `}
+              >
+                <span className="relative z-10">{category.title}</span>
+
+                {/* Elegant underline animation */}
+                {selectedId !== category.id && (
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-0 h-[1.5px] bg-[#A36F5E] transition-all duration-300 ease-out group-hover:w-[calc(100%-24px)] opacity-0 group-hover:opacity-100"></span>
+                )}
+              </Link>
+
+              {/* Premium Subcategory Dropdown */}
+              {isOpen && selectedId === category.id && category.subcategories && (
+                <div
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                >
+                  {/* Arrow indicator */}
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-l border-t border-gray-100 shadow-sm"></div>
+
+                  <div className="relative bg-white rounded-xl shadow-xl border border-gray-100/80 overflow-hidden min-w-[220px] py-2">
+                    {/* Subtle gradient header */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#A36F5E]/20 via-[#A36F5E]/40 to-[#A36F5E]/20"></div>
+
+                    {category.subcategories?.map((subcategory, subIndex) => (
+                      <Link
+                        href={`/${category.slug}/${subcategory.slug}`}
+                        key={`${subcategory.id}-${subIndex}`}
+                        className="group/item relative flex items-center gap-3 px-5 py-3 text-sm text-gray-600 transition-all duration-200 ease-out hover:bg-gray-50/80 hover:text-[#A36F5E]"
+                      >
+                        {/* Hover indicator bar */}
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0 h-[60%] bg-[#A36F5E] rounded-r-full transition-all duration-200 group-hover/item:w-[3px]"></span>
+
+                        {/* Subtle dot indicator */}
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-300 transition-all duration-200 group-hover/item:bg-[#A36F5E] group-hover/item:scale-125"></span>
+
+                        <span className="font-medium tracking-wide">{subcategory.title}</span>
+
+                        {/* Arrow on hover */}
+                        <svg
+                          className="w-4 h-4 ml-auto opacity-0 -translate-x-2 transition-all duration-200 group-hover/item:opacity-100 group-hover/item:translate-x-0 text-[#A36F5E]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    ))}
                   </div>
-                ))}
-                <div className="flex items-center my-2 gap-2">
-                  <h2 className="text-xs">SOUS TOTAL:</h2>
-                  <p className="text-xs text-[#A36F5E]">
-                    {selectedCurrency === "XOF"
-                      ? Math.round(subTotal)
-                      : Number(subTotal / Number(usdRate || 1)).toFixed(2)}{" "}
-                    {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                  </p>
                 </div>
-
-                <div className="w-full flex items-center justify-between gap-4 lg:gap-8 flex-end mt-6">
-                  <Link
-                    href="/panier"
-                    className="border w-1/2 text-center border-[#A36F5E] rounded-full  hover:bg-[#A36F5E] hover:text-white cursor-pointer text-[#A36F5E] p-2 text-sm font-bold transition-all duration-300"
-                  >
-                    Voir le panier
-                  </Link>
-                  <Link
-                    href="/checkout"
-                    className="border w-1/2 text-center border-[#A36F5E] hover:bg-[#A36F5E] hover:text-white cursor-pointer text-[#A36F5E] p-2 text-sm font-bold rounded-full transition-all duration-300"
-                  >
-                    Commander
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="md:flex hidden items-center gap-4">
-        {categories.map((category) => (
-          <div
-            key={category.id}
-            onMouseEnter={() => {
-              handleSelectId(category.id);
-              setIsOpen(true);
-            }}
-            onMouseLeave={() => {
-              setIsOpen(false);
-              setSelectedId(null);
-            }}
-            className="relative text-black/80 cursor-pointer transition-all duration-300 hover:text-white hover:bg-[#A36F5E] p-4"
-          >
-            <Link href={`/${category.slug}`}>{category.title}</Link>
-
-            {isOpen && selectedId === category.id && category.subcategories && (
-              <div className="bg-white min-w-[200px] z-50 flex flex-col gap-2 absolute top-14 left-0 p-4">
-                {category.subcategories?.map((subcategory, index) => (
-                  <Link
-                    href={`/${category.slug}/${subcategory.slug}`}
-                    key={`${subcategory.id}-${index}`}
-                    className="text-black/80 cursor-pointer transition-all duration-300 hover:text-[#A36F5E] p-2"
-                  >
-                    {subcategory.title}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 };

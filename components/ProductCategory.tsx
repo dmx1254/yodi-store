@@ -8,7 +8,7 @@ import Link from "next/link";
 import useStore from "@/lib/store-manage";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { trackAddToCart } from "@/components/MetaPixel";
+import { trackAddToCart, sendToCAPI } from "@/components/MetaPixel";
 
 interface PaginationInfo {
   currentPage: number;
@@ -197,13 +197,23 @@ const ProductCategory = ({ category }: { category: string }) => {
     const finalPrice = product.discount
       ? product.price - (product.price * product.discount) / 100
       : product.price;
-    trackAddToCart({
+    const eventId = trackAddToCart({
       id: product._id as string,
       name: product.title,
       price: finalPrice,
       quantity: 1,
       currency: selectedCurrency,
     });
+
+    // Send to CAPI for better tracking reliability
+    sendToCAPI("AddToCart", {
+      content_ids: [product._id as string],
+      content_name: product.title,
+      content_type: "product",
+      value: finalPrice,
+      currency: selectedCurrency,
+      num_items: 1,
+    }, eventId);
 
     toast.success("Produit ajouté au panier", {
       duration: 3000,
@@ -225,8 +235,8 @@ const ProductCategory = ({ category }: { category: string }) => {
             <button
               onClick={resetFilter}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedSubCategory === null
-                  ? "bg-[#A36F5E] text-white shadow-md"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                ? "bg-[#A36F5E] text-white shadow-md"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
             >
               📋 Tous ({pagination?.totalProducts || 0})
@@ -236,8 +246,8 @@ const ProductCategory = ({ category }: { category: string }) => {
                 key={subcategory.id}
                 onClick={() => handleSubCategoryClick(subcategory.slug)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${selectedSubCategory === subcategory.slug
-                    ? "bg-[#A36F5E] text-white shadow-md"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  ? "bg-[#A36F5E] text-white shadow-md"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
               >
                 {subcategory.title} ({subcategory.slug})
@@ -284,61 +294,71 @@ const ProductCategory = ({ category }: { category: string }) => {
               </div>
             </div>
           ))
-          : products.map((product, index) => (
-            <Link
-              href={`/${category}/${product.subCategory}`}
-              key={`${product._id}-${index}`}
-              className="flex flex-col h-full"
-            >
-              {/* Contenu principal avec flex-1 pour occuper l'espace disponible */}
-              <div className="flex-1 flex flex-col items-center gap-3">
-                <Image
-                  src={product.imageUrl}
-                  alt={product.title}
-                  width={220}
-                  height={220}
-                  className="w-72 h-64 object-cover object-center"
-                />
-                <p className="text-black text-sm font-josefin text-center">
-                  {product.title}
-                </p>
-                <p className="text-black text-xs font-josefin text-center line-clamp-2">
-                  {product.description}
-                </p>
+          : products.map((product, index) => {
+            // Construire l'URL de manière sécurisée - JAMAIS de fallback vers la catégorie seule
+            const productUrl = product.subCategory
+              ? `/${category}/${product.subCategory}`
+              : `/${category}/product/${product._id}`; // Fallback vers page produit par ID
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
-                    {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                  </span>
-                  <span className="text-[#262626] text-xl font-josefin font-medium">
-                    {product.discount && product.discount > 0 && (
-                      <span className="ml-2">
-                        {Math.round(
-                          selectedCurrency === "XOF" ? product.price -
-                            (product.price * product.discount) / 100
-                            : Number(product.price -
-                              (product.price * product.discount) / 100) / Number(usdRate || 1)
-                        ).toFixed(2)}{" "}
-                        {selectedCurrency === "XOF" ? "FCFA" : "USD"}
-                      </span>
-                    )}
-                  </span>
+            return (
+              <div
+                key={`${product._id}-${index}`}
+                className="flex flex-col h-full group"
+              >
+                {/* Zone cliquable pour la navigation (image + texte) */}
+                <Link
+                  href={productUrl}
+                  className="flex-1 flex flex-col items-center gap-3 cursor-pointer"
+                >
+                  <div className="relative overflow-hidden rounded-lg">
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.title}
+                      width={220}
+                      height={220}
+                      className="w-72 h-64 object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                  <p className="text-black text-sm font-josefin text-center group-hover:text-[#A36F5E] transition-colors">
+                    {product.title}
+                  </p>
+                  <p className="text-black text-xs font-josefin text-center line-clamp-2">
+                    {product.description}
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
+                      {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    </span>
+                    <span className="text-[#262626] text-xl font-josefin font-medium">
+                      {product.discount && product.discount > 0 && (
+                        <span className="ml-2">
+                          {Math.round(
+                            selectedCurrency === "XOF" ? product.price -
+                              (product.price * product.discount) / 100
+                              : Number(product.price -
+                                (product.price * product.discount) / 100) / Number(usdRate || 1)
+                          ).toFixed(2)}{" "}
+                          {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                </Link>
+
+                {/* Bouton séparé - PAS dans le Link */}
+                <div className="mt-auto pt-4">
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(product)}
+                    className="bg-[#A36F5E] cursor-pointer text-white px-4 py-2 rounded-md text-sm font-josefin font-medium w-full transition-all duration-300 hover:bg-[#916253]"
+                  >
+                    Ajouter au panier
+                  </button>
                 </div>
               </div>
-
-              <div className="mt-auto pt-4">
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAddToCart(product);
-                  }}
-                  className="bg-[#A36F5E] cursor-pointer text-white px-4 py-2 rounded-md text-sm font-josefin font-medium w-full transition-all duration-300 hover:bg-[#916253]"
-                >
-                  Ajouter au panier
-                </button>
-              </div>
-            </Link>
-          ))}
+            );
+          })}
       </div>
 
       {/* Élément de déclenchement pour la pagination infinie */}

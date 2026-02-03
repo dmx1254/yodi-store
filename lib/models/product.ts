@@ -15,6 +15,7 @@ export interface IProduct extends Document {
   etiquette?: string;
   description?: string;
   usage?: string;
+  isFeatured?: boolean; // Pour le carrousel "produits mis en avant"
 }
 
 const productSchema = new Schema(
@@ -81,6 +82,10 @@ const productSchema = new Schema(
     usage: {
       type: String,
       trim: true,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false, // Par défaut, non mis en avant
     },
   },
   {

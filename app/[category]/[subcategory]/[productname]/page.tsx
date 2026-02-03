@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { IProduct } from "@/lib/models/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { trackViewContent, trackAddToCart } from "@/components/MetaPixel";
+import { trackViewContent, trackAddToCart, sendToCAPI } from "@/components/MetaPixel";
 
 const ProductDetailPage = () => {
   const { addToCart, selectedCurrency, usdRate } = useStore();
@@ -72,13 +72,23 @@ const ProductDetailPage = () => {
     const finalPrice = product.discount
       ? product.price - (product.price * product.discount) / 100
       : product.price;
-    trackAddToCart({
+    const eventId = trackAddToCart({
       id: product._id as string,
       name: product.title,
       price: finalPrice,
       quantity: quantity,
       currency: selectedCurrency,
     });
+
+    // Send to CAPI for better tracking reliability
+    sendToCAPI("AddToCart", {
+      content_ids: [product._id as string],
+      content_name: product.title,
+      content_type: "product",
+      value: finalPrice * quantity,
+      currency: selectedCurrency,
+      num_items: quantity,
+    }, eventId);
 
     toast.success("Produit ajouté au panier", {
       style: {

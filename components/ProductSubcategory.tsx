@@ -8,7 +8,7 @@ import Link from "next/link";
 import useStore from "@/lib/store-manage";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { trackAddToCart } from "@/components/MetaPixel";
+import { trackAddToCart, sendToCAPI } from "@/components/MetaPixel";
 
 interface PaginationInfo {
   currentPage: number;
@@ -135,13 +135,23 @@ const ProductSubcategory = ({
     const finalPrice = product.discount
       ? product.price - (product.price * product.discount) / 100
       : product.price;
-    trackAddToCart({
+    const eventId = trackAddToCart({
       id: product._id as string,
       name: product.title,
       price: finalPrice,
       quantity: 1,
       currency: selectedCurrency,
     });
+
+    // Send to CAPI for better tracking reliability
+    sendToCAPI("AddToCart", {
+      content_ids: [product._id as string],
+      content_name: product.title,
+      content_type: "product",
+      value: finalPrice,
+      currency: selectedCurrency,
+      num_items: 1,
+    }, eventId);
 
     toast.success("Produit ajouté au panier", {
       duration: 3000,
@@ -195,7 +205,7 @@ const ProductSubcategory = ({
           : products.map((product) => (
             <Link
               href={`/${category}/${subcategory}/${product._id}`}
-              key={product.id}
+              key={product._id as string}
               className="flex flex-col h-full"
             >
               {/* Contenu principal avec flex-1 pour occuper l'espace disponible */}
@@ -216,7 +226,7 @@ const ProductSubcategory = ({
 
                 <div className="flex items-center gap-2">
                   <span className="text-[#A36F5E] line-through text-xl font-josefin font-medium">
-                      {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
+                    {selectedCurrency === "XOF" ? product.price : Number(product.price / Number(usdRate || 1)).toFixed(2)} {selectedCurrency === "XOF" ? "FCFA" : "USD"}
                   </span>
                   <span className="text-[#262626] text-xl font-josefin font-medium">
                     {product.discount && product.discount > 0 && (

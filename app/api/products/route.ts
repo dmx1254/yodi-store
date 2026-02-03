@@ -2,8 +2,14 @@ import ProductModel from "@/lib/models/product";
 import { NextResponse } from "next/server";
 
 interface FilterType {
-  category: string;
+  category?: string;
   $or?: Array<{ subCategory: string | RegExp }>;
+  isFeatured?: boolean;
+  stock?: { $gt: number };
+}
+
+interface SortType {
+  [key: string]: 1 | -1;
 }
 
 export async function GET(req: Request) {
@@ -13,15 +19,20 @@ export async function GET(req: Request) {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "8");
 
-  if (!category) {
-    return NextResponse.json({ message: "Catégorie requise" }, { status: 400 });
-  }
+  // Nouveaux paramètres pour le carrousel dynamique
+  const featured = searchParams.get("featured"); // "true" pour produits mis en avant
+  const inStock = searchParams.get("inStock"); // "true" pour stock > 0
+  const sort = searchParams.get("sort") || "newest"; // newest, oldest, price-asc, price-desc
 
   try {
-    // Construction du filtre
-    const filter: FilterType = { category };
+    // Construction du filtre dynamique
+    const filter: FilterType = {};
+
+    if (category) {
+      filter.category = category;
+    }
+
     if (subCategory) {
-      // Essayer plusieurs correspondances possibles pour la sous-catégorie
       filter.$or = [
         { subCategory: subCategory },
         { subCategory: new RegExp(subCategory, 'i') },
@@ -30,22 +41,47 @@ export async function GET(req: Request) {
       ];
     }
 
-    // console.log("Database filter:", JSON.stringify(filter, null, 2));
+    // Filtre pour produits mis en avant (featured)
+    if (featured === "true") {
+      filter.isFeatured = true;
+    }
+
+    // Filtre pour produits en stock uniquement
+    if (inStock === "true") {
+      filter.stock = { $gt: 0 };
+    }
+
+    // Configuration du tri
+    let sortConfig: SortType = { createdAt: -1 }; // Default: newest first
+
+    switch (sort) {
+      case "oldest":
+        sortConfig = { createdAt: 1 };
+        break;
+      case "price-asc":
+        sortConfig = { price: 1 };
+        break;
+      case "price-desc":
+        sortConfig = { price: -1 };
+        break;
+      case "newest":
+      default:
+        sortConfig = { createdAt: -1 };
+        break;
+    }
 
     // Calcul de la pagination
     const skip = (page - 1) * limit;
 
-    // Récupération des produits avec pagination
+    // Récupération des produits avec pagination et tri dynamique
     const products = await ProductModel.find(filter)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort(sortConfig);
 
     // Compter le total pour la pagination
     const total = await ProductModel.countDocuments(filter);
     const totalPages = Math.ceil(total / limit);
-
-    // console.log(`Found ${products.length} products out of ${total} total for category: ${category}, subCategory: ${subCategory}`);
 
     return NextResponse.json({
       products,
@@ -65,3 +101,4 @@ export async function GET(req: Request) {
     );
   }
 }
+
