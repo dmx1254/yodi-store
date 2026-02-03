@@ -4,10 +4,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
 const slides = [
-  { src: "/slider/slide-1.png", alt: "Hair naturelle Oil - Yodi Store" },
-  { src: "/slider/slide-2.png", alt: "Huile Rasta - Yodi Store" },
-  { src: "/slider/slide-3.png", alt: "Spécial Huiles - Yodi Store" },
-  { src: "/slider/slide-4.png", alt: "Collection Complète - Yodi Store" },
+  { src: "/slider/banniere_1.png", alt: "Hair naturelle Oil - Yodi Store" },
+  { src: "/slider/banniere_2.png", alt: "Huile Rasta - Yodi Store" },
+  { src: "/slider/banniere_3.png", alt: "Spécial Huiles - Yodi Store" },
+  { src: "/slider/banniere_4.png", alt: "Collection Complète - Yodi Store" },
 ];
 
 const Slider = () => {
