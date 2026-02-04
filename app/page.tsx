@@ -4,33 +4,33 @@ import LifestyleSection from "@/components/LifestyleSection";
 import ProductCarousel from "@/components/ProductCarousel";
 import SencondFooter from "@/components/SencondFooter";
 import Slider from "@/components/Slider";
+import { connectDB } from "@/lib/db";
+import ProductModel, { IProduct } from "@/lib/models/product";
 
 // ============================================
-// 🚀 SSR + ISR: Fetch products at build/request time with caching
+// 🚀 SSR: Direct database query (more reliable than API fetch on Vercel)
 // ============================================
-async function getCarouselProducts() {
+async function getCarouselProducts(): Promise<IProduct[]> {
   try {
-    // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+    // Connect to database
+    await connectDB();
 
-    const res = await fetch(`${baseUrl}/api/products?limit=12&inStock=true&sort=newest`, {
-      next: { revalidate: 300 } // ISR: revalidate every 5 minutes
-    });
+    // Direct query - bypasses API route issues on Vercel SSR
+    const products = await ProductModel.find({ stock: { $gt: 0 } })
+      .limit(12)
+      .sort({ createdAt: -1 })
+      .lean();
 
-    if (!res.ok) {
-      console.error('Failed to fetch carousel products:', res.status);
-      return [];
-    }
-
-    const data = await res.json();
-    return data.products || [];
+    // Serialize for client component (convert ObjectId to string)
+    return JSON.parse(JSON.stringify(products));
   } catch (error) {
     console.error('Error fetching carousel products:', error);
     return [];
   }
 }
+
+// ISR: Revalidate every 5 minutes
+export const revalidate = 300;
 
 export default async function Home() {
   // Fetch products server-side - passed to client carousel
