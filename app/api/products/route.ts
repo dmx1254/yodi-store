@@ -92,7 +92,13 @@ export async function GET(req: Request) {
         hasNextPage: page < totalPages,
         hasPreviousPage: page > 1
       }
-    }, { status: 200 });
+    }, {
+      status: 200,
+      headers: {
+        // Cache for 5 minutes on Vercel Edge, serve stale for 10 minutes while revalidating
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      }
+    });
   } catch (error) {
     console.log(error);
     return NextResponse.json(

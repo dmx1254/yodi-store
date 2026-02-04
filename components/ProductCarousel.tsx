@@ -6,71 +6,27 @@ import Link from "next/link";
 import { IProduct } from "@/lib/models/product";
 import useStore from "@/lib/store-manage";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { trackAddToCart, sendToCAPI } from "@/components/MetaPixel";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const ProductCarousel = () => {
-    const [products, setProducts] = useState<IProduct[]>([]);
-    const [loading, setLoading] = useState(true);
+// ============================================
+// 🚀 SSR OPTIMIZATION: Props interface for server-fetched data
+// ============================================
+interface ProductCarouselProps {
+    initialProducts: IProduct[];
+}
+
+const ProductCarousel = ({ initialProducts }: ProductCarouselProps) => {
+    // Products come from server - no client fetch needed
+    const [products] = useState<IProduct[]>(initialProducts);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
-    const [isVisible, setIsVisible] = useState(false); // IntersectionObserver
-    const [hasInitialized, setHasInitialized] = useState(false); // Deferred init
     const carouselRef = useRef<HTMLDivElement>(null);
     const sectionRef = useRef<HTMLElement>(null);
     const { addToCart, selectedCurrency, usdRate } = useStore();
 
     // Nombre de cartes visibles selon la taille d'écran
     const [visibleCards, setVisibleCards] = useState(4);
-
-    // ============================================
-    // 🚀 OPTIMIZATION 1: IntersectionObserver pour charger uniquement quand visible
-    // ============================================
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting && !hasInitialized) {
-                        setIsVisible(true);
-                        setHasInitialized(true);
-                    }
-                });
-            },
-            {
-                rootMargin: "200px", // Précharger 200px avant d'entrer dans le viewport
-                threshold: 0,
-            }
-        );
-
-        if (sectionRef.current) {
-            observer.observe(sectionRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, [hasInitialized]);
-
-    // ============================================
-    // 🚀 OPTIMIZATION 2: Fetch différé - seulement quand visible
-    // ============================================
-    useEffect(() => {
-        if (!isVisible) return;
-
-        const fetchProducts = async () => {
-            try {
-                // Paramètres dynamiques: produits en stock, triés par nouveauté
-                // Les nouveaux produits apparaissent automatiquement en premier
-                const response = await fetch("/api/products?limit=12&inStock=true&sort=newest");
-                const data = await response.json();
-                setProducts(data.products || []);
-            } catch (error) {
-                console.error("Error fetching products:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, [isVisible]);
 
     // Responsive: detect screen size (optimisé avec debounce implicite)
     useEffect(() => {
@@ -90,9 +46,9 @@ const ProductCarousel = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Auto-play (pause on hover) - uniquement si initialisé
+    // Auto-play (pause on hover)
     useEffect(() => {
-        if (isPaused || products.length === 0 || !hasInitialized) return;
+        if (isPaused || products.length === 0) return;
 
         const interval = setInterval(() => {
             setCurrentIndex((prev) => {
@@ -102,7 +58,7 @@ const ProductCarousel = () => {
         }, 4000);
 
         return () => clearInterval(interval);
-    }, [isPaused, products.length, visibleCards, hasInitialized]);
+    }, [isPaused, products.length, visibleCards]);
 
     const goToPrev = useCallback(() => {
         setCurrentIndex((prev) => (prev <= 0 ? Math.max(0, products.length - visibleCards) : prev - 1));
@@ -165,35 +121,7 @@ const ProductCarousel = () => {
 
     const maxIndex = Math.max(0, products.length - visibleCards);
 
-    // ============================================
-    // 🚀 OPTIMIZATION 4: Skeleton optimisé avec placeholder LCP
-    // ============================================
-    if (!hasInitialized || loading) {
-        return (
-            <section
-                ref={sectionRef}
-                className="w-full max-w-7xl mx-auto px-4 py-12"
-                aria-label="Carrousel de produits en chargement"
-            >
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold font-josefin text-[#A36F5E]">
-                        Nos huiles & soins les plus appréciés
-                    </h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="flex flex-col gap-3">
-                            <Skeleton className="w-full h-56 rounded-lg" />
-                            <Skeleton className="h-5 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                            <Skeleton className="h-10 w-full rounded-md" />
-                        </div>
-                    ))}
-                </div>
-            </section>
-        );
-    }
-
+    // SSR: No skeleton needed - products are pre-fetched from server
     if (products.length === 0) return null;
 
     return (
