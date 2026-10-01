@@ -92,13 +92,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <head>
-        <MetaPixel />
-      </head>
+    <html lang="fr">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${josefinSans.variable} ${playfairDisplay.variable} antialiased bg-white h-full`}
       >
+        {/* Le fallback noscript du Pixel contient une image : il doit rester
+            dans body pour que le navigateur conserve la structure SSR. */}
+        <MetaPixel />
         <ProviderSession>
           <Toaster />
           {/* Header complet en UN seul bloc, NON sticky : il défile avec la page

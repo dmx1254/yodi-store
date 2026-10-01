@@ -61,7 +61,7 @@ const Categories = () => {
       {/* En-tête de section */}
       <div className="max-w-2xl mx-auto text-center mb-10 md:mb-14">
         <h2 className="font-playfair text-3xl md:text-5xl font-bold text-[#A36F5E] leading-tight">
-          Yodi Cosmetics
+          Yodi-K Store
         </h2>
         <p className="font-josefin text-lg md:text-2xl font-medium text-gray-700 mt-2">
           Parapharmacie en ligne <span className="font-playfair">&amp;</span>{" "}
